@@ -1,0 +1,10 @@
+# -*- coding: utf-8 -*-
+
+*~
+*.pyc
+/.coverage
+/.cache/
+/.tox/
+/htmlcov/
+/pytest_docker.egg-info/
+/src/pytest_docker.egg-info/
