@@ -16,9 +16,7 @@ Usage
 =====
 
 Here is the basic recipe for writing a test that depends on a service that
-responds over HTTP:
-
-.. source-code::
+responds over HTTP::
 
    import pytest
    import requests
