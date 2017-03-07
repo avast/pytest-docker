@@ -1,0 +1,6 @@
+# -*- coding: utf-8 -*-
+
+hello:
+  build: "./containers/hello"
+  ports:
+    - "80"
