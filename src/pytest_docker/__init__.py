@@ -97,9 +97,17 @@ class Services(object):
 
 
 @pytest.fixture(scope='session')
-def docker_compose_file():
-    """."""
-    return 'docker-compose.yml'
+def docker_compose_file(pytestconfig):
+    """Get the docker-compose.yml absolute path.
+
+    Override this fixture in your tests if you need a custom location.
+
+    """
+    return os.path.join(
+        str(pytestconfig.rootdir),
+        'tests',
+        'docker-compose.yml'
+    )
 
 
 @pytest.fixture(scope='session')
