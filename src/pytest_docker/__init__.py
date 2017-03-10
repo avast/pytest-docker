@@ -135,7 +135,7 @@ def docker_services(docker_compose_file, allow_no_docker):
     if allow_no_docker is True:
         try:
             execute('docker ps')
-        except:
+        except Exception:
             # Run against localhost
             yield Services(
                 compose_file=docker_compose_file,
