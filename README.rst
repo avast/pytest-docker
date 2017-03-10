@@ -51,7 +51,22 @@ responds over HTTP::
        """Sample test."""
        response = requests.get(some_service)
        response.raise_for_status()
- 
+
+
+By default this plugin will try to open ``docker-compose.yml`` in your
+``tests`` directory.  If you need to use a custom location, override the
+``docker_compose_file`` fixture inside your ``conftest.py`` file::
+
+   import pytest
+
+   @pytest.fixture(scope='session')
+   def docker_compose_file(pytestconfig):
+       return os.path.join(
+           str(pytestconfig.rootdir),
+           'mycustomdir'
+           'docker-compose.yml'
+       )
+
 
 Contributing
 ============
