@@ -52,10 +52,16 @@ class Services(object):
     """."""
 
     _compose_file = attr.ib()
+    _allow_no_docker = attr.ib(default=False)
+
     _services = attr.ib(init=False, default=attr.Factory(dict))
 
     def port_for(self, service, port):
         """Get the effective bind port for a service."""
+
+        # Return the container port if we run in no Docker mode.
+        if self._allow_no_docker:
+            return port
 
         # Lookup in the cache.
         cache = self._services.get(service, {}).get(port, None)
@@ -111,8 +117,31 @@ def docker_compose_file(pytestconfig):
 
 
 @pytest.fixture(scope='session')
-def docker_services(docker_compose_file):
+def allow_no_docker():
+    """Return if want to run against localhost when docker is not available.
+
+    Override this fixture to return `True` if you want the ability to
+    run without docker.
+
+    """
+    return False
+
+
+@pytest.fixture(scope='session')
+def docker_services(docker_compose_file, allow_no_docker):
     """Ensure all Docker-based services are up and running."""
+
+    # If we allowed to run without Docker, check it's presence
+    if allow_no_docker is True:
+        try:
+            execute('docker ps')
+        except:
+            # Run against localhost
+            yield Services(
+                compose_file=docker_compose_file,
+                allow_no_docker=True
+            )
+            return
 
     # Spawn containers.
     execute('docker-compose -f "%s" up -d' % (docker_compose_file,))
