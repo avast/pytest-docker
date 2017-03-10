@@ -21,7 +21,8 @@ def test_docker_services():
         assert check_output.call_count == 0
 
         # The fixture is a context-manager.
-        gen = docker_services('docker-compose.yml', allow_no_docker=False)
+        gen = docker_services('docker-compose.yml',
+                              docker_allow_fallback=False)
         services = next(gen)
         assert isinstance(services, Services)
 
@@ -72,7 +73,8 @@ def test_docker_services_unused_port():
         assert check_output.call_count == 0
 
         # The fixture is a context-manager.
-        gen = docker_services('docker-compose.yml', allow_no_docker=False)
+        gen = docker_services('docker-compose.yml',
+                              docker_allow_fallback=False)
         services = next(gen)
         assert isinstance(services, Services)
 
@@ -122,7 +124,8 @@ def test_docker_services_failure():
         check_output.returncode = 1
 
         # The fixture is a context-manager.
-        gen = docker_services('docker-compose.yml', allow_no_docker=False)
+        gen = docker_services('docker-compose.yml',
+                              docker_allow_fallback=False)
 
         assert check_output.call_count == 0
 
@@ -169,7 +172,7 @@ def test_wait_until_responsive_timeout():
     )
 
 
-def test_get_port_allow_no_docker_docker_online():
+def test_get_port_docker_allow_fallback_docker_online():
     with mock.patch('subprocess.check_output') as check_output:
         check_output.side_effect = [b'', b'', b'0.0.0.0:32770', b'']
         check_output.returncode = 0
@@ -177,7 +180,8 @@ def test_get_port_allow_no_docker_docker_online():
         assert check_output.call_count == 0
 
         # The fixture is a context-manager.
-        gen = docker_services('docker-compose.yml', allow_no_docker=True)
+        gen = docker_services('docker-compose.yml',
+                              docker_allow_fallback=True)
         services = next(gen)
         assert isinstance(services, Services)
 
@@ -215,7 +219,7 @@ def test_get_port_allow_no_docker_docker_online():
     ]
 
 
-def test_get_port_allow_no_docker_docker_offline():
+def test_get_port_docker_allow_fallback_docker_offline():
     with mock.patch('subprocess.check_output') as check_output:
         check_output.side_effect = [
             subprocess.CalledProcessError(
@@ -224,7 +228,8 @@ def test_get_port_allow_no_docker_docker_offline():
         ]
         check_output.returncode = 1
 
-        gen = docker_services('docker-compose.yml', allow_no_docker=True)
+        gen = docker_services('docker-compose.yml',
+                              docker_allow_fallback=True)
         services = next(gen)
         assert services.port_for('abc', 123) == 123
 
