@@ -18,7 +18,7 @@ def execute(command, success_codes=(0,)):
         )
         status = 0
     except subprocess.CalledProcessError as error:
-        output = error.output
+        output = error.output or b''
         status = error.returncode
         command = error.cmd
     output = output.decode('utf-8')
