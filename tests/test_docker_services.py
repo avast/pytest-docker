@@ -57,7 +57,7 @@ def test_docker_services():
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" down',
+            'docker-compose -f "docker-compose.yml" down -v',
             shell=True, stderr=subprocess.STDOUT,
         ),
     ]
@@ -106,7 +106,7 @@ def test_docker_services_unused_port():
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" down',
+            'docker-compose -f "docker-compose.yml" down -v',
             shell=True, stderr=subprocess.STDOUT,
         ),
     ]
@@ -213,7 +213,7 @@ def test_get_port_docker_allow_fallback_docker_online():
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" down',
+            'docker-compose -f "docker-compose.yml" down -v',
             shell=True, stderr=subprocess.STDOUT,
         ),
     ]

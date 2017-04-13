@@ -150,7 +150,7 @@ def docker_services(docker_compose_file, docker_allow_fallback):
     yield Services(compose_file=docker_compose_file)
 
     # Clean up.
-    execute('docker-compose -f "%s" down' % (docker_compose_file,))
+    execute('docker-compose -f "%s" down -v' % (docker_compose_file,))
 
 
 __all__ = (
