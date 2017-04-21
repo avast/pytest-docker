@@ -144,7 +144,7 @@ def docker_services(docker_compose_file, docker_allow_fallback):
             return
 
     # Spawn containers.
-    execute('docker-compose -f "%s" up -d' % (docker_compose_file,))
+    execute('docker-compose -f "%s" up --build -d' % (docker_compose_file,))
 
     # Let test(s) run.
     yield Services(compose_file=docker_compose_file)

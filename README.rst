@@ -76,6 +76,15 @@ It will use the container port and localhost instead::
        return True
 
 
+Changelog
+=========
+
+Unreleased
+----------
+
+* Added ``--build`` option to ``docker-compose up`` command to automatically
+  rebuild local containers.
+
 Contributing
 ============
 

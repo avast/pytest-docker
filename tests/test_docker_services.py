@@ -49,7 +49,7 @@ def test_docker_services():
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" up -d',
+            'docker-compose -f "docker-compose.yml" up --build -d',
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
@@ -98,7 +98,7 @@ def test_docker_services_unused_port():
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" up -d',
+            'docker-compose -f "docker-compose.yml" up --build -d',
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
@@ -143,7 +143,7 @@ def test_docker_services_failure():
     # Tear down code should not be called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" up -d',
+            'docker-compose -f "docker-compose.yml" up --build -d',
             shell=True, stderr=subprocess.STDOUT,
         ),
     ]
@@ -205,7 +205,7 @@ def test_get_port_docker_allow_fallback_docker_online():
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" up -d',
+            'docker-compose -f "docker-compose.yml" up --build -d',
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
