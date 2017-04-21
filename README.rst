@@ -79,11 +79,12 @@ It will use the container port and localhost instead::
 Changelog
 =========
 
-Unreleased
-----------
+Version 0.3.0
+-------------
 
 * Added ``--build`` option to ``docker-compose up`` command to automatically
   rebuild local containers.
+
 
 Contributing
 ============
