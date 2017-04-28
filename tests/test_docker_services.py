@@ -6,6 +6,7 @@ import pytest
 import subprocess
 
 from pytest_docker import (
+    DockerComposeExecutor,
     docker_services,
     Services,
 )
@@ -21,8 +22,11 @@ def test_docker_services():
         assert check_output.call_count == 0
 
         # The fixture is a context-manager.
-        gen = docker_services('docker-compose.yml',
-                              docker_allow_fallback=False)
+        gen = docker_services(
+            'docker-compose.yml',
+            docker_compose_project_name='pytest123',
+            docker_allow_fallback=False,
+        )
         services = next(gen)
         assert isinstance(services, Services)
 
@@ -49,15 +53,17 @@ def test_docker_services():
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" up --build -d',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" '
+            'up --build -d',
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" port abc 123',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" '
+            'port abc 123',
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" down -v',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" down -v',
             shell=True, stderr=subprocess.STDOUT,
         ),
     ]
@@ -73,8 +79,11 @@ def test_docker_services_unused_port():
         assert check_output.call_count == 0
 
         # The fixture is a context-manager.
-        gen = docker_services('docker-compose.yml',
-                              docker_allow_fallback=False)
+        gen = docker_services(
+            'docker-compose.yml',
+            docker_compose_project_name='pytest123',
+            docker_allow_fallback=False,
+        )
         services = next(gen)
         assert isinstance(services, Services)
 
@@ -98,15 +107,17 @@ def test_docker_services_unused_port():
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" up --build -d',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" '
+            'up --build -d',
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" port abc 123',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" '
+            'port abc 123',
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" down -v',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" down -v',
             shell=True, stderr=subprocess.STDOUT,
         ),
     ]
@@ -124,8 +135,11 @@ def test_docker_services_failure():
         check_output.returncode = 1
 
         # The fixture is a context-manager.
-        gen = docker_services('docker-compose.yml',
-                              docker_allow_fallback=False)
+        gen = docker_services(
+            'docker-compose.yml',
+            docker_compose_project_name='pytest123',
+            docker_allow_fallback=False,
+        )
 
         assert check_output.call_count == 0
 
@@ -143,7 +157,8 @@ def test_docker_services_failure():
     # Tear down code should not be called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" up --build -d',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" '
+            'up --build -d',
             shell=True, stderr=subprocess.STDOUT,
         ),
     ]
@@ -154,7 +169,10 @@ def test_wait_until_responsive_timeout():
     clock.side_effect = [0.0, 1.0, 2.0, 3.0]
 
     with mock.patch('time.sleep') as sleep:
-        services = Services(compose_file='docker-compose.yml')
+        docker_compose = DockerComposeExecutor(
+            compose_file='docker-compose.yml',
+            compose_project_name="pytest123")
+        services = Services(docker_compose)
         with pytest.raises(Exception) as exc:
             print(services.wait_until_responsive(
                 check=lambda: False,
@@ -180,8 +198,11 @@ def test_get_port_docker_allow_fallback_docker_online():
         assert check_output.call_count == 0
 
         # The fixture is a context-manager.
-        gen = docker_services('docker-compose.yml',
-                              docker_allow_fallback=True)
+        gen = docker_services(
+            'docker-compose.yml',
+            docker_compose_project_name='pytest123',
+            docker_allow_fallback=True,
+        )
         services = next(gen)
         assert isinstance(services, Services)
 
@@ -205,18 +226,20 @@ def test_get_port_docker_allow_fallback_docker_online():
             shell=True, stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" up --build -d',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" '
+            'up --build -d',
             shell=True, stderr=subprocess.STDOUT,
-        ),
+            ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" port abc 123',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" '
+            'port abc 123',
             shell=True, stderr=subprocess.STDOUT,
-        ),
+            ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" down -v',
+            'docker-compose -f "docker-compose.yml" -p "pytest123" down -v',
             shell=True, stderr=subprocess.STDOUT,
-        ),
-    ]
+            ),
+        ]
 
 
 def test_get_port_docker_allow_fallback_docker_offline():
@@ -228,8 +251,11 @@ def test_get_port_docker_allow_fallback_docker_offline():
         ]
         check_output.returncode = 1
 
-        gen = docker_services('docker-compose.yml',
-                              docker_allow_fallback=True)
+        gen = docker_services(
+            'docker-compose.yml',
+            docker_compose_project_name='pytest123',
+            docker_allow_fallback=True,
+        )
         services = next(gen)
         assert services.port_for('abc', 123) == 123
 

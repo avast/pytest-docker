@@ -51,7 +51,7 @@ def docker_ip():
 class Services(object):
     """."""
 
-    _compose_file = attr.ib()
+    _docker_compose = attr.ib()
     _docker_allow_fallback = attr.ib(default=False)
 
     _services = attr.ib(init=False, default=attr.Factory(dict))
@@ -68,9 +68,9 @@ class Services(object):
         if cache is not None:
             return cache
 
-        output = execute('docker-compose -f "%s" port %s %d' % (
-            self._compose_file, service, port,
-        ))
+        output = self._docker_compose.execute(
+            'port %s %d' % (service, port,)
+        )
         endpoint = output.strip()
         if not endpoint:
             raise ValueError(
@@ -102,6 +102,18 @@ class Services(object):
         )
 
 
+@attr.s(frozen=True)
+class DockerComposeExecutor(object):
+    _compose_file = attr.ib()
+    _compose_project_name = attr.ib()
+
+    def execute(self, command):
+        return execute(
+            'docker-compose -f "%s" -p "%s" %s' % (
+                self._compose_file, self._compose_project_name, command)
+        )
+
+
 @pytest.fixture(scope='session')
 def docker_compose_file(pytestconfig):
     """Get the docker-compose.yml absolute path.
@@ -117,6 +129,15 @@ def docker_compose_file(pytestconfig):
 
 
 @pytest.fixture(scope='session')
+def docker_compose_project_name():
+    """ Generate a project name using the current process' PID.
+
+    Override this fixture in your tests if you need a particular project name.
+    """
+    return "pytest{}".format(os.getpid())
+
+
+@pytest.fixture(scope='session')
 def docker_allow_fallback():
     """Return if want to run against localhost when docker is not available.
 
@@ -128,8 +149,14 @@ def docker_allow_fallback():
 
 
 @pytest.fixture(scope='session')
-def docker_services(docker_compose_file, docker_allow_fallback):
+def docker_services(
+    docker_compose_file, docker_allow_fallback, docker_compose_project_name
+):
     """Ensure all Docker-based services are up and running."""
+
+    docker_compose = DockerComposeExecutor(
+        docker_compose_file, docker_compose_project_name
+    )
 
     # If we allowed to run without Docker, check it's presence
     if docker_allow_fallback is True:
@@ -137,20 +164,17 @@ def docker_services(docker_compose_file, docker_allow_fallback):
             execute('docker ps')
         except Exception:
             # Run against localhost
-            yield Services(
-                compose_file=docker_compose_file,
-                docker_allow_fallback=True
-            )
+            yield Services(docker_compose, docker_allow_fallback=True)
             return
 
     # Spawn containers.
-    execute('docker-compose -f "%s" up --build -d' % (docker_compose_file,))
+    docker_compose.execute('up --build -d')
 
     # Let test(s) run.
-    yield Services(compose_file=docker_compose_file)
+    yield Services(docker_compose)
 
     # Clean up.
-    execute('docker-compose -f "%s" down -v' % (docker_compose_file,))
+    docker_compose.execute('down -v')
 
 
 __all__ = (
