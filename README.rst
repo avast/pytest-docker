@@ -47,9 +47,9 @@ responds over HTTP::
        )
        return url
 
-   def test_something(some_service):
+   def test_something(some_http_service):
        """Sample test."""
-       response = requests.get(some_service)
+       response = requests.get(some_http_service)
        response.raise_for_status()
 
 
