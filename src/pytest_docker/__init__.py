@@ -102,11 +102,10 @@ class Services(object):
         )
 
 
-def str_to_list(x):
-    if isinstance(x, str):
-        return [x]
-    else:
-        return x
+def str_to_list(arg):
+    if isinstance(arg, (list, tuple)):
+        return arg
+    return [arg]
 
 
 @attr.s(frozen=True)
