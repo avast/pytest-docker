@@ -15,3 +15,17 @@ def test_execute():
                 shell=True, stderr=subprocess.STDOUT,
             ),
         ]
+
+
+def test_multiple_compose_files():
+    docker_compose = DockerComposeExecutor(
+        ["docker-compose.yml", "other-compose.yml"], "pytest123")
+    with mock.patch('subprocess.check_output') as check_output:
+        docker_compose.execute("up")
+        assert check_output.call_args_list == [
+            mock.call(
+                'docker-compose -f "docker-compose.yml" -f "other-compose.yml"'
+                ' -p "pytest123" up',
+                shell=True, stderr=subprocess.STDOUT,
+            ),
+        ]

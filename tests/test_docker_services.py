@@ -170,7 +170,7 @@ def test_wait_until_responsive_timeout():
 
     with mock.patch('time.sleep') as sleep:
         docker_compose = DockerComposeExecutor(
-            compose_file='docker-compose.yml',
+            compose_files='docker-compose.yml',
             compose_project_name="pytest123")
         services = Services(docker_compose)
         with pytest.raises(Exception) as exc:
