@@ -79,6 +79,11 @@ It will use the container port and localhost instead::
 Changelog
 =========
 
+Version 0.6.0
+-------------
+
+* Added ability to return list of files from ``docker_compose_file`` fixture.
+
 Version 0.3.0
 -------------
 
