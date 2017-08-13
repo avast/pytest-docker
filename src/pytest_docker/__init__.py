@@ -102,16 +102,23 @@ class Services(object):
         )
 
 
+def str_to_list(arg):
+    if isinstance(arg, (list, tuple)):
+        return arg
+    return [arg]
+
+
 @attr.s(frozen=True)
 class DockerComposeExecutor(object):
-    _compose_file = attr.ib()
+    _compose_files = attr.ib(convert=str_to_list)
     _compose_project_name = attr.ib()
 
-    def execute(self, command):
-        return execute(
-            'docker-compose -f "%s" -p "%s" %s' % (
-                self._compose_file, self._compose_project_name, command)
-        )
+    def execute(self, subcommand):
+        command = "docker-compose"
+        for compose_file in self._compose_files:
+            command += ' -f "{}"'.format(compose_file)
+        command += ' -p "{}" {}'.format(self._compose_project_name, subcommand)
+        return execute(command)
 
 
 @pytest.fixture(scope='session')
