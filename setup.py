@@ -10,7 +10,7 @@ from setuptools import (
 setup(
     name='pytest-docker',
     url='https://github.com/AndreLouisCaron/pytest-docker',
-    version='0.6.0',
+    version='0.6.1',
     license='MIT',
     maintainer='Andre Caron',
     maintainer_email='andre.l.caron@gmail.com',
