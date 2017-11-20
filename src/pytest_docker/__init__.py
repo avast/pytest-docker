@@ -101,6 +101,12 @@ class Services(object):
             'Timeout reached while waiting on service!'
         )
 
+    def get_logs(self, service):
+        """Fetches the logs of the container of the specified service.
+
+        Use `get_logs.split('\n')` to parse log by line."""
+        return self._docker_compose.execute('logs {}'.format(service))
+
 
 def str_to_list(arg):
     if isinstance(arg, (list, tuple)):
