@@ -56,7 +56,7 @@ class Services(object):
 
     _services = attr.ib(init=False, default=attr.Factory(dict))
 
-    def port_for(self, service, port):
+    def port_for(self, service, port, protocol=None):
         """Get the effective bind port for a service."""
 
         # Return the container port if we run in no Docker mode.
@@ -68,8 +68,13 @@ class Services(object):
         if cache is not None:
             return cache
 
+        if protocol is not None:
+            protocol_arg = ' --protocol=%s' % protocol
+        else:
+            protocol_arg = ''
+
         output = self._docker_compose.execute(
-            'port %s %d' % (service, port,)
+            'port%s %s %d' % (protocol_arg, service, port,)
         )
         endpoint = output.strip()
         if not endpoint:

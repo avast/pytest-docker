@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import pytest
 import requests
 
 from requests.exceptions import (
@@ -18,13 +19,17 @@ def is_responsive(url):
         return False
 
 
-def test_integration(docker_ip, docker_services):
+@pytest.mark.parametrize("protocol", [
+    None,
+    "tcp",
+])
+def test_integration(docker_ip, docker_services, protocol):
     """Showcase the power of our Docker fixtures!"""
 
     # Build URL to service listening on random port.
     url = 'http://%s:%d/' % (
         docker_ip,
-        docker_services.port_for('hello', 80),
+        docker_services.port_for('hello', 80, protocol=protocol),
     )
 
     # Wait until service is responsive.
