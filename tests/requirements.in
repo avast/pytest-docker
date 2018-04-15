@@ -6,3 +6,4 @@ flake8
 mock
 pytest
 requests
+docker-compose
