@@ -38,3 +38,8 @@ def test_integration(docker_ip, docker_services):
     response = requests.get(url)
     response.raise_for_status()
     print(response.text)
+
+
+def test_direct_ip(docker_ip, docker_services):
+    ip = docker_services.ip_for('hello')
+    assert len(ip.split('.')) == 4

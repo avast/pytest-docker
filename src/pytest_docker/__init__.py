@@ -8,6 +8,7 @@ import re
 import subprocess
 import time
 import timeit
+import json
 
 
 def execute(command, success_codes=(0,)):
@@ -100,6 +101,36 @@ class Services(object):
         raise Exception(
             'Timeout reached while waiting on service!'
         )
+
+    def ip_for(self, service):
+        """Get direct IP of container"""
+        # List containers providing given service
+        containers_ids = self._docker_compose.execute(
+            "ps -q %s" % service).strip().splitlines()
+        if len(containers_ids) == 0:
+            raise ValueError(
+                "Can not find container for service '%s'" % service)
+        if len(containers_ids) > 1:
+            raise Exception(
+                "Multiple containers (%d) for one service '%s' detected"
+                % (len(containers_ids), service))
+
+        # Read out info about listed container
+        docker_info = json.loads(
+            execute("docker inspect %s" % containers_ids[0])
+        )
+        if not docker_info:
+            raise Exception(
+                "Couldn't fetch information data about container %s "
+                % containers_ids[0])
+        network_settings = docker_info[0]['NetworkSettings']
+        networks = network_settings['Networks']
+        if not networks:
+            raise Exception(
+                "Container %s doesn't have network attached"
+                % containers_ids[0])
+        for i in networks.values():
+            return i['IPAddress']
 
 
 def str_to_list(arg):
