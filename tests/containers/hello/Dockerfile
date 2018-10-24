@@ -6,4 +6,7 @@ FROM python:3.6-alpine
 # as if touched by Ctrl+c.
 STOPSIGNAL SIGINT
 
-CMD [ "python", "-m", "http.server", "80" ]
+WORKDIR /app
+ADD server.py /app
+
+CMD [ "python", "/app/server.py" ]

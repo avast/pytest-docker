@@ -1,6 +1,12 @@
-# -*- coding: utf-8 -*-
+---
+version: '2'
+services:
+  hello:
+    build: "./containers/hello"
+    ports:
+      - "80"
+    volumes:
+      - test_volume:/test_volume
 
-hello:
-  build: "./containers/hello"
-  ports:
-    - "80"
+volumes:
+  test_volume:
