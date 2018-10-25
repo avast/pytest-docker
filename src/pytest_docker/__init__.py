@@ -39,7 +39,7 @@ def docker_ip():
     if not docker_host:
         return '127.0.0.1'
 
-    match = re.match('^tcp://(.+?):\d+$', docker_host)
+    match = re.match(r'^tcp://(.+?):\d+$', docker_host)
     if not match:
         raise ValueError(
             'Invalid value for DOCKER_HOST: "%s".' % (docker_host,)
