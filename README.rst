@@ -68,16 +68,14 @@ By default this plugin will try to open ``docker-compose.yml`` in your
        )
 
 
-You can allow this plugin to run your tests when Docker is not available.
-It will use the container port and localhost instead::
-
-   @pytest.fixture(scope='session')
-   def docker_allow_fallback():
-       return True
-
-
 Changelog
 =========
+
+Version 0.7.0
+-------------
+
+* Removed the fallback method that allowed running without Docker.
+  It wasn't being used.
 
 Version 0.6.0
 -------------
