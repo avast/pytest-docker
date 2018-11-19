@@ -39,7 +39,8 @@ def test_main_fixtures_work(docker_ip, docker_services):
     assert response.status_code == 204
 
 
-def test_containers_and_volumes_get_cleaned_up(testdir, tmpdir, docker_compose_file):
+def test_containers_and_volumes_get_cleaned_up(
+        testdir, tmpdir, docker_compose_file):
     _copy_compose_files_to_testdir(testdir, docker_compose_file)
 
     project_name_file_path = path.join(str(tmpdir), 'project_name.txt')
@@ -80,7 +81,8 @@ def _copy_compose_files_to_testdir(testdir, compose_file_path):
     directory_for_compose_files = testdir.mkdir('tests')
     shutil.copy(compose_file_path, str(directory_for_compose_files))
 
-    container_build_files_dir = path.realpath(path.join(compose_file_path, '../containers'))
+    container_build_files_dir = path.realpath(
+        path.join(compose_file_path, '../containers'))
     shutil.copytree(
         container_build_files_dir,
         str(directory_for_compose_files) + '/containers',

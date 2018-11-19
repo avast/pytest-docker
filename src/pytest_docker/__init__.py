@@ -54,7 +54,7 @@ class Services(object):
     _docker_compose = attr.ib()
     _services = attr.ib(init=False, default=attr.Factory(dict))
 
-    def port_for(self, service, port):
+    def port_for(self, service, port, proto='tcp'):
         """Get the effective bind port for a service."""
 
         # Lookup in the cache.
@@ -63,12 +63,13 @@ class Services(object):
             return cache
 
         output = self._docker_compose.execute(
-            'port %s %d' % (service, port,)
+            'port --protocol=%s %s %d' % (proto, service, port)
         )
         endpoint = output.strip()
         if not endpoint:
             raise ValueError(
-                'Could not detect port for "%s:%d".' % (service, port)
+                'Could not detect port for "%s:%d/%s".' %
+                (service, port, proto)
             )
 
         # Usually, the IP address here is 0.0.0.0, so we don't use it.
