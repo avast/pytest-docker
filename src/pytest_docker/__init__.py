@@ -148,14 +148,16 @@ def docker_services(
         docker_compose_file, docker_compose_project_name
     )
 
-    # Spawn containers.
-    docker_compose.execute('up --build -d')
 
-    # Let test(s) run.
-    yield Services(docker_compose)
+    try:
+        # Spawn containers.
+        docker_compose.execute('up --build -d')
 
-    # Clean up.
-    docker_compose.execute('down -v')
+        # Let test(s) run.
+        yield Services(docker_compose)
+    finally:
+        # Clean up.
+        docker_compose.execute('down -v')
 
 
 __all__ = (
