@@ -140,24 +140,26 @@ def docker_compose_project_name():
 
 @pytest.fixture(scope='session')
 def docker_services(
-    docker_compose_file, docker_compose_project_name
+    request, docker_compose_file, docker_compose_project_name
 ):
     """Ensure all Docker-based services are up and running."""
+
+    def _cleanup():
+        docker_compose.execute('down -v')
 
     docker_compose = DockerComposeExecutor(
         docker_compose_file, docker_compose_project_name
     )
 
+    # If failure happens beyond this point, run cleanup
+    request.addfinalizer(_cleanup)
 
-    try:
-        # Spawn containers.
-        docker_compose.execute('up --build -d')
+    # Spawn containers.
+    docker_compose.execute('up --build -d')
 
-        # Let test(s) run.
-        yield Services(docker_compose)
-    finally:
-        # Clean up.
-        docker_compose.execute('down -v')
+    # Let test(s) run.
+    yield Services(docker_compose)
+
 
 
 __all__ = (
