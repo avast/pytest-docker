@@ -158,7 +158,7 @@ def docker_services(
     docker_compose.execute('up --build -d')
 
     # Let test(s) run.
-    yield Services(docker_compose)
+    return Services(docker_compose)
 
 
 
