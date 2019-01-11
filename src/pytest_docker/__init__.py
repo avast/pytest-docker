@@ -143,14 +143,12 @@ def docker_services(
     request, docker_compose_file, docker_compose_project_name
 ):
     """Ensure all Docker-based services are up and running."""
-
     def _cleanup():
         docker_compose.execute('down -v')
 
     docker_compose = DockerComposeExecutor(
         docker_compose_file, docker_compose_project_name
     )
-
     # If failure happens beyond this point, run cleanup
     request.addfinalizer(_cleanup)
 
