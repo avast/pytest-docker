@@ -65,7 +65,8 @@ class Services(object):
         output = self._docker_compose.execute(
             'port %s %d' % (service, port,)
         )
-        endpoint = output.strip()
+        # Strip output from newlines and ANSI color codes
+        endpoint = re.sub(r'\x1B\[[0-?]*[ -/]*[@-~]', '', output).strip()
         if not endpoint:
             raise ValueError(
                 'Could not detect port for "%s:%d".' % (service, port)
