@@ -10,11 +10,11 @@ import time
 import timeit
 
 
-def execute(command, success_codes=(0,)):
+def execute(command, success_codes=(0,), **kwargs):
     """Run a shell command."""
     try:
         output = subprocess.check_output(
-            command, stderr=subprocess.STDOUT, shell=True,
+            command, **kwargs,
         )
         status = 0
     except subprocess.CalledProcessError as error:
@@ -27,6 +27,16 @@ def execute(command, success_codes=(0,)):
             'Command %r returned %d: """%s""".' % (command, status, output)
         )
     return output
+
+
+@pytest.fixture(scope='session')
+def docker_compose_subprocess_default_kwargs():
+    return {'stderr': subprocess.STDOUT, 'shell': True}
+
+
+@pytest.fixture(scope='session')
+def docker_compose_subprocess_kwargs():
+    return {}
 
 
 @pytest.fixture(scope='session')
@@ -106,13 +116,14 @@ def str_to_list(arg):
 class DockerComposeExecutor(object):
     _compose_files = attr.ib(convert=str_to_list)
     _compose_project_name = attr.ib()
+    _compose_subprocess_kwargs = attr.ib()
 
     def execute(self, subcommand):
         command = "docker-compose"
         for compose_file in self._compose_files:
             command += ' -f "{}"'.format(compose_file)
         command += ' -p "{}" {}'.format(self._compose_project_name, subcommand)
-        return execute(command)
+        return execute(command, **self._compose_subprocess_kwargs)
 
 
 @pytest.fixture(scope='session')
@@ -140,12 +151,16 @@ def docker_compose_project_name():
 
 @pytest.fixture(scope='session')
 def docker_services(
-    docker_compose_file, docker_compose_project_name
+        docker_compose_file, docker_compose_project_name, docker_compose_subprocess_default_kwargs, 
+        docker_compose_subprocess_kwargs
 ):
     """Ensure all Docker-based services are up and running."""
 
+    subprocess_kwargs = {**docker_compose_subprocess_default_kwargs}
+    subprocess_kwargs.update(docker_compose_subprocess_kwargs)
+
     docker_compose = DockerComposeExecutor(
-        docker_compose_file, docker_compose_project_name
+        docker_compose_file, docker_compose_project_name, subprocess_kwargs
     )
 
     # Spawn containers.
