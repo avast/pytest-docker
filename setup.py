@@ -42,6 +42,6 @@ setup(
         ],
     },
     install_requires=[
-        'attrs>=16',
+        'attrs>=17.4',
     ],
 )
