@@ -104,7 +104,7 @@ def str_to_list(arg):
 
 @attr.s(frozen=True)
 class DockerComposeExecutor(object):
-    _compose_files = attr.ib(convert=str_to_list)
+    _compose_files = attr.ib(converter=str_to_list)
     _compose_project_name = attr.ib()
 
     def execute(self, subcommand):
