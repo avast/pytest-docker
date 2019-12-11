@@ -2,6 +2,7 @@
 
 
 import attr
+import contextlib
 import os
 import pytest
 import re
@@ -29,10 +30,7 @@ def execute(command, success_codes=(0,)):
     return output
 
 
-@pytest.fixture(scope='session')
-def docker_ip():
-    """Determine IP address for TCP connections to Docker containers."""
-
+def get_docker_ip():
     # When talking to the Docker daemon via a UNIX socket, route all TCP
     # traffic to docker containers via the TCP loopback interface.
     docker_host = os.environ.get('DOCKER_HOST', '').strip()
@@ -45,6 +43,12 @@ def docker_ip():
             'Invalid value for DOCKER_HOST: "%s".' % (docker_host,)
         )
     return match.group(1)
+
+
+@pytest.fixture(scope='session')
+def docker_ip():
+    """Determine IP address for TCP connections to Docker containers."""
+    return get_docker_ip()
 
 
 @attr.s(frozen=True)
@@ -104,7 +108,7 @@ def str_to_list(arg):
 
 @attr.s(frozen=True)
 class DockerComposeExecutor(object):
-    _compose_files = attr.ib(convert=str_to_list)
+    _compose_files = attr.ib(converter=str_to_list)
     _compose_project_name = attr.ib()
 
     def execute(self, subcommand):
@@ -138,12 +142,10 @@ def docker_compose_project_name():
     return "pytest{}".format(os.getpid())
 
 
-@pytest.fixture(scope='session')
-def docker_services(
+@contextlib.contextmanager
+def get_docker_services(
     docker_compose_file, docker_compose_project_name
 ):
-    """Ensure all Docker-based services are up and running."""
-
     docker_compose = DockerComposeExecutor(
         docker_compose_file, docker_compose_project_name
     )
@@ -156,6 +158,17 @@ def docker_services(
 
     # Clean up.
     docker_compose.execute('down -v')
+
+
+@pytest.fixture(scope='session')
+def docker_services(
+    docker_compose_file, docker_compose_project_name
+):
+    """Ensure all Docker-based services are up and running."""
+    with get_docker_services(
+        docker_compose_file, docker_compose_project_name
+    ) as ds:
+        yield ds
 
 
 __all__ = (

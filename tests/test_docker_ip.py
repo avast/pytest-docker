@@ -4,13 +4,13 @@
 import mock
 import pytest
 
-from pytest_docker import docker_ip
+from pytest_docker import get_docker_ip
 
 
 def test_docker_ip_native():
     environ = {}
     with mock.patch('os.environ', environ):
-        assert docker_ip() == '127.0.0.1'
+        assert get_docker_ip() == '127.0.0.1'
 
 
 def test_docker_ip_remote():
@@ -18,7 +18,7 @@ def test_docker_ip_remote():
         'DOCKER_HOST': 'tcp://1.2.3.4:2376',
     }
     with mock.patch('os.environ', environ):
-        assert docker_ip() == '1.2.3.4'
+        assert get_docker_ip() == '1.2.3.4'
 
 
 @pytest.mark.parametrize('docker_host', [
@@ -30,7 +30,7 @@ def test_docker_ip_remote_invalid(docker_host):
     }
     with mock.patch('os.environ', environ):
         with pytest.raises(ValueError) as exc:
-            print(docker_ip())
+            print(get_docker_ip())
         assert str(exc.value) == (
             'Invalid value for DOCKER_HOST: "%s".' % (docker_host,)
         )
