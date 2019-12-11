@@ -14,38 +14,32 @@ import timeit
 def execute(command, success_codes=(0,)):
     """Run a shell command."""
     try:
-        output = subprocess.check_output(
-            command, stderr=subprocess.STDOUT, shell=True,
-        )
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
         status = 0
     except subprocess.CalledProcessError as error:
-        output = error.output or b''
+        output = error.output or b""
         status = error.returncode
         command = error.cmd
-    output = output.decode('utf-8')
+    output = output.decode("utf-8")
     if status not in success_codes:
-        raise Exception(
-            'Command %r returned %d: """%s""".' % (command, status, output)
-        )
+        raise Exception('Command %r returned %d: """%s""".' % (command, status, output))
     return output
 
 
 def get_docker_ip():
     # When talking to the Docker daemon via a UNIX socket, route all TCP
     # traffic to docker containers via the TCP loopback interface.
-    docker_host = os.environ.get('DOCKER_HOST', '').strip()
+    docker_host = os.environ.get("DOCKER_HOST", "").strip()
     if not docker_host:
-        return '127.0.0.1'
+        return "127.0.0.1"
 
-    match = re.match(r'^tcp://(.+?):\d+$', docker_host)
+    match = re.match(r"^tcp://(.+?):\d+$", docker_host)
     if not match:
-        raise ValueError(
-            'Invalid value for DOCKER_HOST: "%s".' % (docker_host,)
-        )
+        raise ValueError('Invalid value for DOCKER_HOST: "%s".' % (docker_host,))
     return match.group(1)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def docker_ip():
     """Determine IP address for TCP connections to Docker containers."""
     return get_docker_ip()
@@ -66,25 +60,20 @@ class Services(object):
         if cache is not None:
             return cache
 
-        output = self._docker_compose.execute(
-            'port %s %d' % (service, port,)
-        )
+        output = self._docker_compose.execute("port %s %d" % (service, port))
         endpoint = output.strip()
         if not endpoint:
-            raise ValueError(
-                'Could not detect port for "%s:%d".' % (service, port)
-            )
+            raise ValueError('Could not detect port for "%s:%d".' % (service, port))
 
         # Usually, the IP address here is 0.0.0.0, so we don't use it.
-        match = int(endpoint.split(':', 1)[1])
+        match = int(endpoint.split(":", 1)[1])
 
         # Store it in cache in case we request it multiple times.
         self._services.setdefault(service, {})[port] = match
 
         return match
 
-    def wait_until_responsive(self, check, timeout, pause,
-                              clock=timeit.default_timer):
+    def wait_until_responsive(self, check, timeout, pause, clock=timeit.default_timer):
         """Wait until a service is responsive."""
 
         ref = clock()
@@ -95,9 +84,7 @@ class Services(object):
             time.sleep(pause)
             now = clock()
 
-        raise Exception(
-            'Timeout reached while waiting on service!'
-        )
+        raise Exception("Timeout reached while waiting on service!")
 
 
 def str_to_list(arg):
@@ -119,21 +106,17 @@ class DockerComposeExecutor(object):
         return execute(command)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def docker_compose_file(pytestconfig):
     """Get the docker-compose.yml absolute path.
 
     Override this fixture in your tests if you need a custom location.
 
     """
-    return os.path.join(
-        str(pytestconfig.rootdir),
-        'tests',
-        'docker-compose.yml'
-    )
+    return os.path.join(str(pytestconfig.rootdir), "tests", "docker-compose.yml")
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def docker_compose_project_name():
     """ Generate a project name using the current process' PID.
 
@@ -143,36 +126,26 @@ def docker_compose_project_name():
 
 
 @contextlib.contextmanager
-def get_docker_services(
-    docker_compose_file, docker_compose_project_name
-):
+def get_docker_services(docker_compose_file, docker_compose_project_name):
     docker_compose = DockerComposeExecutor(
         docker_compose_file, docker_compose_project_name
     )
 
     # Spawn containers.
-    docker_compose.execute('up --build -d')
+    docker_compose.execute("up --build -d")
 
     # Let test(s) run.
     yield Services(docker_compose)
 
     # Clean up.
-    docker_compose.execute('down -v')
+    docker_compose.execute("down -v")
 
 
-@pytest.fixture(scope='session')
-def docker_services(
-    docker_compose_file, docker_compose_project_name
-):
+@pytest.fixture(scope="session")
+def docker_services(docker_compose_file, docker_compose_project_name):
     """Ensure all Docker-based services are up and running."""
-    with get_docker_services(
-        docker_compose_file, docker_compose_project_name
-    ) as ds:
+    with get_docker_services(docker_compose_file, docker_compose_project_name) as ds:
         yield ds
 
 
-__all__ = (
-    'docker_compose_file',
-    'docker_ip',
-    'docker_services',
-)
+__all__ = ("docker_compose_file", "docker_ip", "docker_services")
