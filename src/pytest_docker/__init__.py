@@ -52,16 +52,10 @@ class Services(object):
     """."""
 
     _docker_compose = attr.ib()
-    _docker_allow_fallback = attr.ib(default=False)
-
     _services = attr.ib(init=False, default=attr.Factory(dict))
 
     def port_for(self, service, port):
         """Get the effective bind port for a service."""
-
-        # Return the container port if we run in no Docker mode.
-        if self._docker_allow_fallback:
-            return port
 
         # Lookup in the cache.
         cache = self._services.get(service, {}).get(port, None)
@@ -145,34 +139,14 @@ def docker_compose_project_name():
 
 
 @pytest.fixture(scope='session')
-def docker_allow_fallback():
-    """Return if want to run against localhost when docker is not available.
-
-    Override this fixture to return `True` if you want the ability to
-    run without docker.
-
-    """
-    return False
-
-
-@pytest.fixture(scope='session')
 def docker_services(
-    docker_compose_file, docker_allow_fallback, docker_compose_project_name
+    docker_compose_file, docker_compose_project_name
 ):
     """Ensure all Docker-based services are up and running."""
 
     docker_compose = DockerComposeExecutor(
         docker_compose_file, docker_compose_project_name
     )
-
-    # If we allowed to run without Docker, check it's presence
-    if docker_allow_fallback is True:
-        try:
-            execute('docker ps')
-        except Exception:
-            # Run against localhost
-            yield Services(docker_compose, docker_allow_fallback=True)
-            return
 
     # Spawn containers.
     docker_compose.execute('up --build -d')
