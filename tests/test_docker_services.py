@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
-
-
-import mock
-import pytest
 import subprocess
+from unittest import mock
 
-from pytest_docker import DockerComposeExecutor, get_docker_services, Services
+import pytest
+from pytest_docker.plugin import DockerComposeExecutor, Services, get_docker_services
 
 
 def test_docker_services():
@@ -42,19 +39,19 @@ def test_docker_services():
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" -p "pytest123" ' "up --build -d",
-            shell=True,
+            'docker-compose -f "docker-compose.yml" -p "pytest123" up --build -d',
             stderr=subprocess.STDOUT,
+            shell=True,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" -p "pytest123" ' "port abc 123",
-            shell=True,
+            'docker-compose -f "docker-compose.yml" -p "pytest123" port abc 123',
             stderr=subprocess.STDOUT,
+            shell=True,
         ),
         mock.call(
             'docker-compose -f "docker-compose.yml" -p "pytest123" down -v',
-            shell=True,
             stderr=subprocess.STDOUT,
+            shell=True,
         ),
     ]
 
@@ -125,7 +122,7 @@ def test_docker_services_failure():
 
         # Failure propagates with improved diagnoatics.
         assert str(exc.value) == (
-            'Command %r returned %d: """%s""".' % ("the command", 1, "the output")
+            'Command {} returned {}: """{}""".'.format("the command", 1, "the output")
         )
 
         assert check_output.call_count == 1

@@ -1,3 +1,1 @@
-# -*- coding: utf-8 -*-
-
-pytest_plugins = ["pytester"]
+pytest_plugins = ["pytester"]  # pylint: disable=invalid-name

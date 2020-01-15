@@ -1,8 +1,0 @@
-# -*- coding: utf-8 -*-
-
-coverage
-docutils
-flake8
-mock
-pytest
-requests

@@ -14,6 +14,6 @@ def test_app(_, start_response):
     return [b""]
 
 
-httpd = make_server("", 80, test_app)
+HTTPD = make_server("", 80, test_app)
 print("Test server running...")
-httpd.serve_forever()
+HTTPD.serve_forever()

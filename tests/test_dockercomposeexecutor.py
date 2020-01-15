@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-import mock
 import subprocess
+from unittest import mock
 
 import py
-
-from pytest_docker import DockerComposeExecutor
+from pytest_docker.plugin import DockerComposeExecutor
 
 
 def test_execute():
