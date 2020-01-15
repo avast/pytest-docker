@@ -1,3 +1,4 @@
+---
 sudo: required
 services:
   - docker
@@ -26,7 +27,7 @@ before_script:
 
 script:
   - if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then tox -e py35; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then tox -e py36; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then pip install --upgrade setuptools; tox -e py36; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then tox -e py37; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3.8' ]]; then tox -e py38; fi
 
