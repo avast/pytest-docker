@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 sudo: required
 services:
   - docker
@@ -7,10 +5,13 @@ services:
 language: python
 
 python:
-  - "2.7"
   - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
 
 before_install:
+  - pip install --upgrade setuptools wheel
   - pip --version
   - docker --version
   - docker-compose --version
@@ -25,8 +26,7 @@ before_script:
   - docker-compose -f tests/docker-compose.yml build
 
 script:
-  - if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then tox -e py27; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then tox -e py35; fi
+  - tox
 
 after_script:
   # Always leave a clean slate.
