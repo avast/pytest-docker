@@ -11,7 +11,6 @@ python:
   - "3.8"
 
 before_install:
-  - pip install --upgrade setuptools wheel
   - pip --version
   - docker --version
   - docker-compose --version
@@ -19,14 +18,17 @@ before_install:
 install:
   - pip install tox
   - pip install coveralls
+  - pip install --upgrade setuptools wheel
 
 before_script:
-  # Pre-cache images to prevent timeout in service availability checks.
   - docker-compose -f tests/docker-compose.yml pull
   - docker-compose -f tests/docker-compose.yml build
 
 script:
-  - tox
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then tox -e py35; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then tox -e py36; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then tox -e py37; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.8' ]]; then tox -e py38; fi
 
 after_script:
   # Always leave a clean slate.
