@@ -18,9 +18,9 @@ before_install:
 install:
   - pip install tox
   - pip install coveralls
-  - pip install --upgrade setuptools wheel
 
 before_script:
+  - pip install --upgrade setuptools wheel
   - docker-compose -f tests/docker-compose.yml pull
   - docker-compose -f tests/docker-compose.yml build
 
