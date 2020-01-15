@@ -17,17 +17,17 @@ before_install:
   - docker-compose --version
 
 install:
+  - pip install --upgrade setuptools
   - pip install tox
   - pip install coveralls
 
 before_script:
-  - pip install --upgrade setuptools wheel
   - docker-compose -f tests/docker-compose.yml pull
   - docker-compose -f tests/docker-compose.yml build
 
 script:
   - if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then tox -e py35; fi
-  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then pip install --upgrade setuptools; tox -e py36; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then tox -e py36; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then tox -e py37; fi
   - if [[ $TRAVIS_PYTHON_VERSION == '3.8' ]]; then tox -e py38; fi
 
