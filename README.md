@@ -14,6 +14,7 @@ Specify all necessary containers in a `docker-compose.yml` file and and
 This package is tested with Python versions `3.5`, `3.6`, `3.7` and `3.8` and
 `pytest` version 5. Python 2 is not supported.
 
+`pytest-docker` was originally created by André Caron.
 
 # Usage
 Here is a basic example a test that depends on a service that
