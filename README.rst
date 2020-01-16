@@ -45,7 +45,11 @@ responds over HTTP::
           timeout=30.0, pause=0.1,
           check=lambda: is_responsive(url)
        )
-       return url
+       yield url
+
+       # Optionally print/log container logs for debugging.
+       for line in docker_services.get_logs('abc').split('\n'):
+           log.debug(line)
 
    def test_something(some_http_service):
        """Sample test."""

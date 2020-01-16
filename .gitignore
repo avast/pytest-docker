@@ -8,3 +8,5 @@
 /htmlcov/
 /pytest_docker.egg-info/
 /src/pytest_docker.egg-info/
+build
+dist
