@@ -12,12 +12,11 @@ python:
   - "3.8"
 
 before_install:
-  - pip --version
   - docker --version
   - docker-compose --version
 
 install:
-  - pip install --upgrade setuptools
+  - pip install --upgrade pip setuptools
 
 before_script:
   - docker-compose -f tests/docker-compose.yml pull
