@@ -19,6 +19,7 @@ install:
   - pip install --upgrade pip setuptools
 
 before_script:
+  # Pre-cache images to prevent timeout in service availability checks
   - docker-compose -f tests/docker-compose.yml pull
   - docker-compose -f tests/docker-compose.yml build
 

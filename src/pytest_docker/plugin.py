@@ -44,7 +44,8 @@ def get_docker_ip():
 
 @pytest.fixture(scope="session")
 def docker_ip():
-    """Determine IP address for TCP connections to Docker containers."""
+    """Determine the IP address for TCP connections to Docker containers."""
+
     return get_docker_ip()
 
 
@@ -54,24 +55,38 @@ class Services:
     _docker_compose = attr.ib()
     _services = attr.ib(init=False, default=attr.Factory(dict))
 
-    def port_for(self, service, port):
-        """Get the effective bind port for a service."""
+    def port_for(self, service, container_port):
+        """Return the "host" port for `service` and `container_port`.
+
+        E.g. If the service is defined like this:
+
+            version: '2'
+            services:
+              httpbin:
+                build: .
+                ports:
+                  - "8000:80"
+
+        this method will return 8000 for container_port=80.
+        """
 
         # Lookup in the cache.
-        cache = self._services.get(service, {}).get(port, None)
+        cache = self._services.get(service, {}).get(container_port, None)
         if cache is not None:
             return cache
 
-        output = self._docker_compose.execute("port %s %d" % (service, port))
+        output = self._docker_compose.execute("port %s %d" % (service, container_port))
         endpoint = output.strip().decode("utf-8")
         if not endpoint:
-            raise ValueError('Could not detect port for "%s:%d".' % (service, port))
+            raise ValueError(
+                'Could not detect port for "%s:%d".' % (service, container_port)
+            )
 
         # Usually, the IP address here is 0.0.0.0, so we don't use it.
         match = int(endpoint.split(":", 1)[1])
 
         # Store it in cache in case we request it multiple times.
-        self._services.setdefault(service, {})[port] = match
+        self._services.setdefault(service, {})[container_port] = match
 
         return match
 
@@ -111,20 +126,17 @@ class DockerComposeExecutor:
 
 @pytest.fixture(scope="session")
 def docker_compose_file(pytestconfig):
-    """Get the docker-compose.yml absolute path.
+    """Get an absolute path to the  `docker-compose.yml` file. Override this
+    fixture in your tests if you need a custom location."""
 
-    Override this fixture in your tests if you need a custom location.
-
-    """
     return os.path.join(str(pytestconfig.rootdir), "tests", "docker-compose.yml")
 
 
 @pytest.fixture(scope="session")
 def docker_compose_project_name():
-    """ Generate a project name using the current process' PID.
+    """Generate a project name using the current process PID. Override this
+    fixture in your tests if you need a particular project name."""
 
-    Override this fixture in your tests if you need a particular project name.
-    """
     return "pytest{}".format(os.getpid())
 
 
@@ -146,7 +158,9 @@ def get_docker_services(docker_compose_file, docker_compose_project_name):
 
 @pytest.fixture(scope="session")
 def docker_services(docker_compose_file, docker_compose_project_name):
-    """Ensure all Docker-based services are up and running."""
+    """Start all services from a docker compose file (`docker-compose up`).
+    After test are finished, shutdown all services (`docker-compose down`)."""
+
     with get_docker_services(
         docker_compose_file, docker_compose_project_name
     ) as docker_service:

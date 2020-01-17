@@ -16,9 +16,23 @@ This package is tested with Python versions `3.5`, `3.6`, `3.7` and `3.8` and
 
 `pytest-docker` was originally created by André Caron.
 
+
 # Usage
-Here is a basic example a test that depends on a service that
-responds over HTTP:
+Here is an example of a test that depends on a HTTP service.
+
+With a `docker-compose.yml` file like this (using the
+[httpbin](https://httpbin.org/) service):
+
+```yaml
+version: '2'
+services:
+  httpbin:
+    image: "kennethreitz/httpbin"
+    ports:
+      - "8000:80"
+```
+
+You can write a test like this:
 
 ```python
 import pytest
@@ -40,7 +54,8 @@ def is_responsive(url):
 def http_service(docker_ip, docker_services):
     """Ensure that HTTP service is up and responsive."""
 
-    port = docker_services.port_for("abc", 123)
+    # `port_for` takes a container port and returns the corresponding host port
+    port = docker_services.port_for("httpbin", 80)
     url = "http://{}:{}".format(docker_ip, port)
     docker_services.wait_until_responsive(
         timeout=30.0, pause=0.1, check=lambda: is_responsive(url)
@@ -48,15 +63,16 @@ def http_service(docker_ip, docker_services):
     return url
 
 
-def test_something(http_service):
+def test_status_code(http_service):
+    status = 418
+    response = requests.get(http_service + "/status/{}".format(status))
 
-    response = requests.get(http_service)
-    response.raise_for_status()
+    assert response.status_code == status
 ```
 
 By default this plugin will try to open `docker-compose.yml` in your
 `tests` directory. If you need to use a custom location, override the
-`docker_compose_file` fixture inside your `conftest.py` file::
+`docker_compose_file` fixture inside your `conftest.py` file:
 
 ```python
 import os
@@ -68,6 +84,28 @@ def docker_compose_file(pytestconfig):
     return os.path.join(str(pytestconfig.rootdir), "mycustomdir", "docker-compose.yml")
 ```
 
+## Available fixtures
+All fixtures have `session` scope.
+
+### `docker_ip`
+
+Determine the IP address for TCP connections to Docker containers.
+
+### `docker_compose_file`
+
+Get an absolute path to the  `docker-compose.yml` file. Override this fixture in
+your tests if you need a custom location.
+
+### `docker_compose_project_name`
+
+Generate a project name using the current process PID. Override this fixture in
+your tests if you need a particular project name.
+
+### `docker_services`
+
+Start all services from the docker compose file (`docker-compose up`).
+After test are finished, shutdown all services (`docker-compose down`).
+
 
 # Contributing
 This pytest plug-in and its source code are made available to you under a MIT
@@ -76,3 +114,7 @@ the license for details!
 
 Found a bug? Think a new feature would make this plug-in more practical? We
 welcome issues and pull requests!
+
+When creating a pull request, be sure to follow this projects conventions - use
+[black](https://github.com/psf/black) with default settings for formatting, run
+tests with `python setup.py test` and make sure that all checks are passing.
