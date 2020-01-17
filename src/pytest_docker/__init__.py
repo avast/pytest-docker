@@ -9,6 +9,9 @@ import re
 import subprocess
 import time
 import timeit
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def execute(command, success_codes=(0,)):
@@ -134,8 +137,16 @@ def get_docker_services(docker_compose_file, docker_compose_project_name):
     # Spawn containers.
     docker_compose.execute("up --build -d")
 
+    services = Services(docker_compose)
     # Let test(s) run.
-    yield Services(docker_compose)
+    yield services
+
+    # Print service logs for debugging.
+    # noinspection PyProtectedMember
+    for service in services._services:
+        output = docker_compose.execute('logs {}'.format(service))
+        for line in output.split('\n'):
+            log.info(line)
 
     # Clean up.
     docker_compose.execute("down -v")
