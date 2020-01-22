@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
+from unittest import mock
 
-
-import mock
 import pytest
-
-from pytest_docker import get_docker_ip
+from pytest_docker.plugin import get_docker_ip
 
 
 def test_docker_ip_native():

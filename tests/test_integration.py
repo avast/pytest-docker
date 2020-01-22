@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-
-from os import path
 import shutil
 import subprocess
+from os import path
 
 import requests
 from requests.exceptions import ConnectionError
