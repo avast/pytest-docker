@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.7.1
+- Minor packaging related fixes
+	- Fix description content type in `setup.cfg`
+	- Add `skip_cleanup` option to travis-ci settings
+
 ## Version 0.7.0
 - Removed the fallback method that allowed running without Docker
 - Package cleanup

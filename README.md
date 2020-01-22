@@ -1,6 +1,6 @@
 Docker-based integration tests
 =====
-[![PyPI version](https://img.shields.io/pypi/v/pytest-docker?color=blue)](https://pypi.org/project/pytest-docker/)
+[![PyPI version](https://img.shields.io/pypi/v/pytest-docker?color=green)](https://pypi.org/project/pytest-docker/)
 [![Python versions](https://img.shields.io/pypi/pyversions/pytest-docker)](https://pypi.org/project/pytest-docker/)
 [![Code style](https://img.shields.io/badge/formatted%20with-black-black)](https://github.com/psf/black)
 

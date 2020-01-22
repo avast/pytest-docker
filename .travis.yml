@@ -36,6 +36,7 @@ deploy:
     branch: master
   distributions: "sdist bdist_wheel"
   skip_existing: true
+  skip_cleanup: true
   user: __token__
   password:
     secure: RMvwktWLI7pdoyUZzDd9e3qc4NfunaHrpRcyQWUeU8ZmxVXh3EFhbHlW+rk/WQ8ubLDCtvLcvfGBvnfYwhpvyV4yXR1J/XOBiVFcz4sMMl8yPERQjqLZwU5y6pPn4B8SSku88K3mrFjg/lOXBmTxY66FCnegbAXUzXP1UNZNodgdlh/D+d1SjlhW4Fkvn8U/Mf+zvj+UmnefyYFg7XIeMN5ko+d4I+JP1Q6Euh/iFVFgJtCMXn/gtw5j6018QiNA5W1MzCudz7HPVR+qiZt94N102LCpius0bY7Id/pWeWsPfX2mWKnYQR6Zx2SAU/mXzz0SdVlTzm7TAiuaUsmd2HdmCIhqeueQpqzIJO8yupyb9/VD/mRwCr9imd65LMcK6FQoAkbEVX4tjsujNUrWGseKiJBCrSU7E7i4zjWo6v/dxo4jwHR7pOTPtFLuDIst1ZtBhcjwwpjH/N+wnTxZTMWioHTAN4U8c5gqifENvK832osm9dtI1ewiC2V+Qmxb0Zuwapstt3wqCgMXInMZlRsYSla0I+AmrX/nnLPz3oQ6Ca+sanHZL93tqeaczqdkEV4yQMWUMFVv0GJWc6/dhgsqeZv3Z2diEFWHmVxyEBZ4sZN27pTrAYrW0pb/qgw8yKDTguxvAiWDAC/QN8gSvwIdn3Oyy9y4D8v0wHNu55Q=
