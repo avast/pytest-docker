@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.7.2
+- Changes:
+	- Update package README
+
 ## Version 0.7.1
 - Minor packaging related fixes
 	- Fix description content type in `setup.cfg`
