@@ -16,6 +16,13 @@ This package is tested with Python versions `3.5`, `3.6`, `3.7` and `3.8` and
 
 `pytest-docker` was originally created by André Caron.
 
+# Installation
+Install `pytest-docker` with `pip` or add it to your test requirements. It is
+recommended to install `docker-compose` python package directly in your
+environment to ensure that it is available during tests. This will prevent
+potential dependency conflicts that can occur when the system wide
+`docker-compose` is used in tests.
+
 
 # Usage
 Here is an example of a test that depends on a HTTP service.
