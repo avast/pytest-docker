@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.8.0
+- Changes:
+	- Add explicit dependencies on `docker-compose` and `pytest`
+	- Stop using deprecated `pytest-runner` to run package tests
+
 ## Version 0.7.2
 - Changes:
 	- Update package README
