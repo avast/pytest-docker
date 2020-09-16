@@ -82,6 +82,11 @@ class Services:
                 'Could not detect port for "%s:%d".' % (service, container_port)
             )
 
+        # This handles messy output that might contain warnings or other text
+        # Added specifically to handle a deprecation warning in Python3.5
+        if len(endpoint.split("\n")) > 1:
+            endpoint = endpoint.split("\n")[-1]
+
         # Usually, the IP address here is 0.0.0.0, so we don't use it.
         match = int(endpoint.split(":", 1)[1])
 
