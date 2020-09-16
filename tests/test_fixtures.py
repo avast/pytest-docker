@@ -10,3 +10,7 @@ def test_docker_compose_file(docker_compose_file):
 
 def test_docker_compose_project(docker_compose_project_name):
     assert docker_compose_project_name == "pytest{}".format(os.getpid())
+
+
+def test_docker_cleanup(docker_cleanup):
+    assert docker_cleanup == "down -v"

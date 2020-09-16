@@ -113,6 +113,10 @@ your tests if you need a particular project name.
 Start all services from the docker compose file (`docker-compose up`).
 After test are finished, shutdown all services (`docker-compose down`).
 
+### `docker_cleanup`
+
+Get the docker compose command to execute for test clean-up actions. Override
+this fixture in your tests if you need custom clean-up actions.
 
 # Contributing
 This pytest plug-in and its source code are made available to you under a MIT
