@@ -10,7 +10,6 @@ python:
   - '3.8'
   - '3.9-dev'
 env:
-  - PYTEST_VERSION=4
   - PYTEST_VERSION=5
   - PYTEST_VERSION=6
 before_install:

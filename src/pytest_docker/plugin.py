@@ -140,12 +140,17 @@ def docker_compose_project_name():
     return "pytest{}".format(os.getpid())
 
 
+def get_cleanup_command():
+
+    return "down -v"
+
+
 @pytest.fixture(scope="session")
 def docker_cleanup():
     """Get the docker_compose command to be executed for test clean-up actions.
      Override this fixture in your tests if you need to change clean-up actions."""
 
-    return "down -v"
+    return get_cleanup_command()
 
 
 @contextlib.contextmanager
@@ -167,11 +172,11 @@ def get_docker_services(
 
 
 @pytest.fixture(scope="session")
-def docker_services(docker_compose_file, docker_compose_project_name):
+def docker_services(docker_compose_file, docker_compose_project_name, docker_cleanup):
     """Start all services from a docker compose file (`docker-compose up`).
     After test are finished, shutdown all services (`docker-compose down`)."""
 
     with get_docker_services(
-        docker_compose_file, docker_compose_project_name
+        docker_compose_file, docker_compose_project_name, docker_cleanup
     ) as docker_service:
         yield docker_service

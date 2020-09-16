@@ -2,7 +2,12 @@ import subprocess
 from unittest import mock
 
 import pytest
-from pytest_docker.plugin import DockerComposeExecutor, Services, get_docker_services
+from pytest_docker.plugin import (
+    DockerComposeExecutor,
+    Services,
+    get_docker_services,
+    get_cleanup_command,
+)
 
 
 def test_docker_services():
@@ -16,7 +21,9 @@ def test_docker_services():
 
         # The fixture is a context-manager.
         with get_docker_services(
-            "docker-compose.yml", docker_compose_project_name="pytest123"
+            "docker-compose.yml",
+            docker_compose_project_name="pytest123",
+            docker_cleanup=get_cleanup_command(),
         ) as services:
             assert isinstance(services, Services)
 
@@ -67,7 +74,9 @@ def test_docker_services_unused_port():
 
         # The fixture is a context-manager.
         with get_docker_services(
-            "docker-compose.yml", docker_compose_project_name="pytest123"
+            "docker-compose.yml",
+            docker_compose_project_name="pytest123",
+            docker_cleanup=get_cleanup_command(),
         ) as services:
             assert isinstance(services, Services)
 
@@ -116,7 +125,9 @@ def test_docker_services_failure():
         # The fixture is a context-manager.
         with pytest.raises(Exception) as exc:
             with get_docker_services(
-                "docker-compose.yml", docker_compose_project_name="pytest123"
+                "docker-compose.yml",
+                docker_compose_project_name="pytest123",
+                docker_cleanup=get_cleanup_command(),
             ):
                 pass
 
