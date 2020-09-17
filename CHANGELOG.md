@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.9.0
+- Changes:
+	- Add the `docker_cleanup` fixture to allow custom cleanup actions for
+	docker-compose
+
 ## Version 0.8.0
 - Changes:
 	- Add explicit dependencies on `docker-compose` and `pytest`
