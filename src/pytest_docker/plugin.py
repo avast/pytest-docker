@@ -82,6 +82,11 @@ class Services:
                 'Could not detect port for "%s:%d".' % (service, container_port)
             )
 
+        # This handles messy output that might contain warnings or other text
+        # Added specifically to handle a deprecation warning in Python3.5
+        if len(endpoint.split("\n")) > 1:
+            endpoint = endpoint.split("\n")[-1]
+
         # Usually, the IP address here is 0.0.0.0, so we don't use it.
         match = int(endpoint.split(":", 1)[1])
 
@@ -140,12 +145,17 @@ def docker_compose_project_name():
     return "pytest{}".format(os.getpid())
 
 
+def get_cleanup_command():
+
+    return "down -v"
+
+
 @pytest.fixture(scope="session")
 def docker_cleanup():
     """Get the docker_compose command to be executed for test clean-up actions.
      Override this fixture in your tests if you need to change clean-up actions."""
 
-    return "down -v"
+    return get_cleanup_command()
 
 
 @contextlib.contextmanager
@@ -167,11 +177,11 @@ def get_docker_services(
 
 
 @pytest.fixture(scope="session")
-def docker_services(docker_compose_file, docker_compose_project_name):
+def docker_services(docker_compose_file, docker_compose_project_name, docker_cleanup):
     """Start all services from a docker compose file (`docker-compose up`).
     After test are finished, shutdown all services (`docker-compose down`)."""
 
     with get_docker_services(
-        docker_compose_file, docker_compose_project_name
+        docker_compose_file, docker_compose_project_name, docker_cleanup
     ) as docker_service:
         yield docker_service

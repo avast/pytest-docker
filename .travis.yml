@@ -1,24 +1,30 @@
+---
 sudo: required
 services:
-- docker
+  - docker
 language: python
 python:
-- '3.5'
-- '3.6'
-- '3.7'
-- '3.8'
+  - '3.5'
+  - '3.6'
+  - '3.7'
+  - '3.8'
+  - '3.9-dev'
+env:
+  - PYTEST_VERSION=4
+  - PYTEST_VERSION=5
+  - PYTEST_VERSION=6
 before_install:
-- docker --version
-- docker-compose --version
+  - docker --version
+  - docker-compose --version
 install:
-- pip install --upgrade pip setuptools
+  - pip install --upgrade pip setuptools pytest=="$PYTEST_VERSION.*" ".[tests]"
 before_script:
-- docker-compose -f tests/docker-compose.yml pull
-- docker-compose -f tests/docker-compose.yml build
+  - docker-compose -f tests/docker-compose.yml pull
+  - docker-compose -f tests/docker-compose.yml build
 script:
-- python setup.py test
+  - pytest -c setup.cfg
 after_script:
-- docker-compose -f tests/docker-compose.yml down
+  - docker-compose -f tests/docker-compose.yml down
 deploy:
   provider: pypi
   on:

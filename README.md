@@ -1,6 +1,7 @@
 Docker-based integration tests
 =====
 [![PyPI version](https://img.shields.io/pypi/v/pytest-docker?color=green)](https://pypi.org/project/pytest-docker/)
+[![Build Status](https://travis-ci.org/avast/pytest-docker.svg?branch=master)](https://travis-ci.org/avast/pytest-docker)
 [![Python versions](https://img.shields.io/pypi/pyversions/pytest-docker)](https://pypi.org/project/pytest-docker/)
 [![Code style](https://img.shields.io/badge/formatted%20with-black-black)](https://github.com/psf/black)
 
@@ -11,8 +12,8 @@ tests with Docker and [docker-compose](https://docs.docker.com/compose/).
 Specify all necessary containers in a `docker-compose.yml` file and and
 `pytest-docker` will spin them up for the duration of your tests.
 
-This package is tested with Python versions `3.5`, `3.6`, `3.7` and `3.8` and
-`pytest` version 5. Python 2 is not supported.
+This package is tested with Python versions `3.5`, `3.6`, `3.7`, `3.8` and
+`3.9`, and `pytest` version 4, 5 and 6. Python 2 is not supported.
 
 `pytest-docker` was originally created by André Caron.
 
@@ -118,6 +119,27 @@ After test are finished, shutdown all services (`docker-compose down`).
 Get the docker compose command to execute for test clean-up actions. Override
 this fixture in your tests if you need custom clean-up actions.
 
+# Development
+Use of a virtual environment is recommended. See the
+[venv](https://docs.python.org/3/library/venv.html) package for more
+information.
+
+First, install `pytest-docker` and its test dependencies:
+
+	pip install -e ".[tests]"
+
+Run tests with
+
+	pytest -c setup.cfg
+
+to make sure that the correct configuration is used. This is also how tests are
+run in CI.
+
+Use [black](https://pypi.org/project/black/) with default settings for
+formatting. You can also use `pylint` with `setup.cfg` as the configuration
+file.
+
+
 # Contributing
 This pytest plug-in and its source code are made available to you under a MIT
 license. It is safe to use in commercial and closed-source applications. Read
@@ -126,6 +148,5 @@ the license for details!
 Found a bug? Think a new feature would make this plug-in more practical? We
 welcome issues and pull requests!
 
-When creating a pull request, be sure to follow this projects conventions - use
-[black](https://github.com/psf/black) with default settings for formatting, run
-tests with `python setup.py test` and make sure that all checks are passing.
+When creating a pull request, be sure to follow this projects conventions (see
+above).
