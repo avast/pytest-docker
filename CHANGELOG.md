@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.10.0
+- Changes:
+	- Drop Python3.5 support
+
 ## Version 0.9.0
 - Changes:
 	- Add the `docker_cleanup` fixture to allow custom cleanup actions for
