@@ -83,7 +83,6 @@ class Services:
             )
 
         # This handles messy output that might contain warnings or other text
-        # Added specifically to handle a deprecation warning in Python3.5
         if len(endpoint.split("\n")) > 1:
             endpoint = endpoint.split("\n")[-1]
 
