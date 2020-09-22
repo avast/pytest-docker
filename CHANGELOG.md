@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.10.1
+- Changes:
+	- Allow higher version of `attrs`
+
 ## Version 0.10.0
 - Changes:
 	- Drop Python3.5 support
