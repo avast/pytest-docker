@@ -84,7 +84,10 @@ class Services:
 
         # This handles messy output that might contain warnings or other text
         if len(endpoint.split("\n")) > 1:
-            endpoint = endpoint.split("\n")[-1]
+            if os.name == 'posix':
+                endpoint = endpoint.split("\n")[-1]
+            else:
+                endpoint = endpoint.split("\n")[-2].replace('\r', '')
 
         # Usually, the IP address here is 0.0.0.0, so we don't use it.
         match = int(endpoint.split(":", 1)[1])
