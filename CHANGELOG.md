@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.10.2
+- Changes:
+	- Allow higher version of `attrs` (21.0)
+
 ## Version 0.10.1
 - Changes:
 	- Allow higher version of `attrs`
