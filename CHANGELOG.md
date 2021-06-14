@@ -1,26 +1,30 @@
 # Changelog
 
+## Version 0.10.2
+Changes:
+- Allow higher version of `attrs` (21.0)
+
 ## Version 0.10.1
-- Changes:
-	- Allow higher version of `attrs`
+Changes:
+- Allow higher version of `attrs`
 
 ## Version 0.10.0
-- Changes:
-	- Drop Python3.5 support
+Changes:
+- Drop Python3.5 support
 
 ## Version 0.9.0
-- Changes:
-	- Add the `docker_cleanup` fixture to allow custom cleanup actions for
-	docker-compose
+Changes:
+- Add the `docker_cleanup` fixture to allow custom cleanup actions for
+docker-compose
 
 ## Version 0.8.0
-- Changes:
-	- Add explicit dependencies on `docker-compose` and `pytest`
-	- Stop using deprecated `pytest-runner` to run package tests
+Changes:
+- Add explicit dependencies on `docker-compose` and `pytest`
+- Stop using deprecated `pytest-runner` to run package tests
 
 ## Version 0.7.2
-- Changes:
-	- Update package README
+Changes:
+- Update package README
 
 ## Version 0.7.1
 - Minor packaging related fixes
