@@ -1,7 +1,7 @@
 Docker-based integration tests
 =====
 [![PyPI version](https://img.shields.io/pypi/v/pytest-docker?color=green)](https://pypi.org/project/pytest-docker/)
-[![Build Status](https://travis-ci.org/avast/pytest-docker.svg?branch=master)](https://travis-ci.org/avast/pytest-docker)
+[![Build Status](https://github.com/avast/pytest-docker/actions/workflows/tests.yaml/badge.svg?branch=master)](https://github.com/avast/pytest-docker/actions/workflows/tests.yaml)
 [![Python versions](https://img.shields.io/pypi/pyversions/pytest-docker)](https://pypi.org/project/pytest-docker/)
 [![Code style](https://img.shields.io/badge/formatted%20with-black-black)](https://github.com/psf/black)
 
