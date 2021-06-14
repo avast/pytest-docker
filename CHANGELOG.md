@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.10.3
+Changes:
+- Ensure that Docker cleanup is executed even with after tests have failed
+
 ## Version 0.10.2
 Changes:
 - Allow higher version of `attrs` (21.0)

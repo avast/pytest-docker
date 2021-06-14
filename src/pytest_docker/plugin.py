@@ -168,11 +168,12 @@ def get_docker_services(
     # Spawn containers.
     docker_compose.execute("up --build -d")
 
-    # Let test(s) run.
-    yield Services(docker_compose)
-
-    # Clean up.
-    docker_compose.execute(docker_cleanup)
+    try:
+        # Let test(s) run.
+        yield Services(docker_compose)
+    finally:
+        # Clean up.
+        docker_compose.execute(docker_cleanup)
 
 
 @pytest.fixture(scope="session")
