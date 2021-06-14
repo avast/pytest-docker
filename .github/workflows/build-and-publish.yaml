@@ -1,0 +1,30 @@
+---
+name: Build and Publish
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '*.md'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel twine
+      - name: Build distribution packages
+        run: |
+          python setup.py sdist bdist_wheel
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          twine upload dist/*
