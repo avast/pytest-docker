@@ -4,7 +4,7 @@ import re
 import subprocess
 import time
 import timeit
-
+import uuid
 import attr
 
 import pytest
@@ -144,6 +144,42 @@ def docker_compose_project_name():
     return "pytest{}".format(os.getpid())
 
 
+@pytest.fixture(scope="package")
+def docker_compose_package_project_name():
+    """Generate a project name using the current process PID and a random uid.
+    Override this fixture in your tests if you need a particular project name.
+    This is a package scoped fixture. The project name will contain the scope"""
+
+    return "pytest{}-package{}".format(os.getpid(), str(uuid.uuid4()).split("-")[1])
+
+
+@pytest.fixture(scope="module")
+def docker_compose_module_project_name():
+    """Generate a project name using the current process PID. Override this
+    fixture in your tests if you need a particular project name.
+    This is a module scoped fixture. The project name will contain the scope"""
+
+    return "pytest{}-module{}".format(os.getpid(), str(uuid.uuid4()).split("-")[1])
+
+
+@pytest.fixture(scope="class")
+def docker_compose_class_project_name():
+    """Generate a project name using the current process PID. Override this
+    fixture in your tests if you need a particular project name.
+    This is a class scoped fixture. The project name will contain the scope"""
+
+    return "pytest{}-class{}".format(os.getpid(), str(uuid.uuid4()).split("-")[1])
+
+
+@pytest.fixture(scope="function")
+def docker_compose_function_project_name():
+    """Generate a project name using the current process PID. Override this
+    fixture in your tests if you need a particular project name.
+    This is a function scoped fixture. The project name will contain the scope"""
+
+    return "pytest{}-function{}".format(os.getpid(), str(uuid.uuid4()).split("-")[1])
+
+
 def get_cleanup_command():
 
     return "down -v"
@@ -185,3 +221,51 @@ def docker_services(docker_compose_file, docker_compose_project_name, docker_cle
         docker_compose_file, docker_compose_project_name, docker_cleanup
     ) as docker_service:
         yield docker_service
+
+
+@pytest.fixture(scope="package")
+def docker_package_services(docker_compose_file, docker_compose_package_project_name, docker_cleanup):
+    """Start all services from a docker compose file (`docker-compose up`).
+    After test are finished, shutdown all services (`docker-compose down`).
+    This is a package scoped fixture, container are destroy at the end of pytest class."""
+
+    with get_docker_services(
+        docker_compose_file, docker_compose_package_project_name, docker_cleanup
+    ) as docker_class_services:
+        yield docker_class_services
+
+
+@pytest.fixture(scope="module")
+def docker_module_services(docker_compose_file, docker_compose_module_project_name, docker_cleanup):
+    """Start all services from a docker compose file (`docker-compose up`).
+    After test are finished, shutdown all services (`docker-compose down`).
+    This is a module scoped fixture, container are destroy at the end of pytest class."""
+
+    with get_docker_services(
+        docker_compose_file, docker_compose_module_project_name, docker_cleanup
+    ) as docker_class_services:
+        yield docker_class_services
+
+
+@pytest.fixture(scope="class")
+def docker_class_services(docker_compose_file, docker_compose_class_project_name, docker_cleanup):
+    """Start all services from a docker compose file (`docker-compose up`).
+    After test are finished, shutdown all services (`docker-compose down`).
+    This is a class scoped fixture, container are destroy at the end of pytest class."""
+
+    with get_docker_services(
+        docker_compose_file, docker_compose_class_project_name, docker_cleanup
+    ) as docker_class_services:
+        yield docker_class_services
+
+
+@pytest.fixture(scope="function")
+def docker_function_services(docker_compose_file, docker_compose_function_project_name, docker_cleanup):
+    """Start all services from a docker compose file (`docker-compose up`).
+    After test are finished, shutdown all services (`docker-compose down`).
+    This is a function scoped fixture, container are destroy at the end of single test."""
+
+    with get_docker_services(
+        docker_compose_file, docker_compose_function_project_name, docker_cleanup
+    ) as docker_function_services:
+        yield docker_function_services
