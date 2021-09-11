@@ -161,12 +161,14 @@ def get_up_command():
 
     return "up --build -d"
 
+
 @pytest.fixture(scope="session")
 def docker_setup():
     """Get the docker_compose command to be executed for test setup actions.
      Override this fixture in your tests if you need to change setup actions."""
 
     return get_up_command()
+
 
 @contextlib.contextmanager
 def get_docker_services(
