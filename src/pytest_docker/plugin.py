@@ -194,11 +194,16 @@ def get_docker_services(
 
 
 @pytest.fixture(scope="session")
-def docker_services(docker_compose_file, docker_compose_project_name, docker_cleanup):
+def docker_services(
+    docker_compose_file,
+    docker_compose_project_name,
+    docker_spawn,
+    docker_cleanup,
+):
     """Start all services from a docker compose file (`docker-compose up`).
     After test are finished, shutdown all services (`docker-compose down`)."""
 
     with get_docker_services(
-        docker_compose_file, docker_compose_project_name, docker_cleanup
+        docker_compose_file, docker_compose_project_name, docker_spawn, docker_cleanup
     ) as docker_service:
         yield docker_service
