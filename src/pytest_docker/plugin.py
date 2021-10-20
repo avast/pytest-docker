@@ -152,28 +152,45 @@ def get_cleanup_command():
 @pytest.fixture(scope="session")
 def docker_cleanup():
     """Get the docker_compose command to be executed for test clean-up actions.
-     Override this fixture in your tests if you need to change clean-up actions."""
+    Override this fixture in your tests if you need to change clean-up actions.
+    Returning anything that would evaluate to False will skip this command."""
 
     return get_cleanup_command()
 
 
+def get_spawn_command():
+
+    return "up --build -d"
+
+
+@pytest.fixture(scope="session")
+def docker_spawn():
+    """Get the docker_compose command to be executed for test spawn actions.
+    Override this fixture in your tests if you need to change spawn actions.
+    Returning anything that would evaluate to False will skip this command."""
+
+    return get_spawn_command()
+
+
 @contextlib.contextmanager
 def get_docker_services(
-    docker_compose_file, docker_compose_project_name, docker_cleanup
+    docker_compose_file, docker_compose_project_name, docker_spawn, docker_cleanup
 ):
     docker_compose = DockerComposeExecutor(
         docker_compose_file, docker_compose_project_name
     )
 
     # Spawn containers.
-    docker_compose.execute("up --build -d")
+    if docker_spawn:
+        docker_compose.execute(docker_spawn)
 
     try:
         # Let test(s) run.
         yield Services(docker_compose)
     finally:
         # Clean up.
-        docker_compose.execute(docker_cleanup)
+        if docker_cleanup:
+            docker_compose.execute(docker_cleanup)
 
 
 @pytest.fixture(scope="session")

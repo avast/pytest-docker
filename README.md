@@ -116,8 +116,15 @@ After test are finished, shutdown all services (`docker-compose down`).
 
 ### `docker_cleanup`
 
-Get the docker compose command to execute for test clean-up actions. Override
-this fixture in your tests if you need custom clean-up actions.
+Get the docker_compose command to be executed for test clean-up actions.
+Override this fixture in your tests if you need to change clean-up actions.
+Returning anything that would evaluate to False will skip this command.
+
+### `docker_spawn`
+
+Get the docker_compose command to be executed for test spawn actions.
+Override this fixture in your tests if you need to change spawn actions.
+Returning anything that would evaluate to False will skip this command.
 
 # Development
 Use of a virtual environment is recommended. See the
