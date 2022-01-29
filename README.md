@@ -24,6 +24,14 @@ environment to ensure that it is available during tests. This will prevent
 potential dependency conflicts that can occur when the system wide
 `docker-compose` is used in tests.
 
+The default behavior is not to install `docker-compose` at all. If you
+want to, you install `pytest-docker` with the `docker-compose` extra,
+you can use the following command:
+
+```
+pip install pytest-docker[docker-compose-v1]
+```
+
 
 # Usage
 Here is an example of a test that depends on a HTTP service.
