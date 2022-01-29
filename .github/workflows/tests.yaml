@@ -15,6 +15,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install Docker Compose v2
+        run: |
+          mkdir -p ~/.docker/cli-plugins/
+          curl -SL https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+          [[ "$(docker compose version)" = "Docker Compose version v2.2.3" ]] || exit 2
       - name: Install tox
         run: |
           python -m pip install --upgrade pip tox
