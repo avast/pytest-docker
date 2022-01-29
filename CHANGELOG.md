@@ -6,6 +6,8 @@ Changes:
   installing `pytest-docker` with PIP. If you want to, you install
   `pytest-docker` with the `docker-compose-v1` extra (`pip install
   pytest-docker[docker-compose-v1]`).
+- Add support for Docker Compose v2 via a new pytest fixture,
+  `docker_compose_command` that should return `docker compose`.
 
 ## Version 0.12.0
 Changes:

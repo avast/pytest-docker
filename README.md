@@ -25,13 +25,23 @@ potential dependency conflicts that can occur when the system wide
 `docker-compose` is used in tests.
 
 The default behavior is not to install `docker-compose` at all. If you
-want to, you install `pytest-docker` with the `docker-compose` extra,
-you can use the following command:
+want to, you install `pytest-docker` with the `docker-compose-v1`
+extra, you can use the following command:
 
 ```
 pip install pytest-docker[docker-compose-v1]
 ```
 
+## Docker Compose v2 compatiblity
+
+This version of `pytest-docker` is compatible with Docker Compose v1
+(legacy) and Docker Compose v2 if you have
+[`compose-switch`](https://github.com/docker/compose-switch)
+installed.
+
+If you want to use the real Docker Compose v2, it has to be installed
+system wide ([more
+information](https://github.com/docker/compose#linux)).
 
 # Usage
 Here is an example of a test that depends on a HTTP service.
@@ -133,6 +143,12 @@ Returning anything that would evaluate to False will skip this command.
 Get the docker_compose command to be executed for test clean-up actions.
 Override this fixture in your tests if you need to change clean-up actions.
 Returning anything that would evaluate to False will skip this command.
+
+### `docker_compose_command`
+
+Docker Compose command to use to execute Dockers. Default is to use
+Docker Compose v1 (command is `docker-compose`). If you want to use
+Docker Compose v2, change this fixture to return `docker compose`.
 
 # Development
 Use of a virtual environment is recommended. See the
