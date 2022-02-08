@@ -8,7 +8,6 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
-        pytest-version: [4, 5, 6]
 
     steps:
       - uses: actions/checkout@v2
@@ -16,18 +15,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies, pytest ${{ matrix.pytest-version }}
+      - name: Install tox
         run: |
-          python -m pip install --upgrade pip setuptools
-          pip install pytest==${{ matrix.pytest-version }}
-          pip install ".[tests]"
-      - name: Build image
+          python -m pip install --upgrade pip tox
+      - name: Run tox testenvs
+        env:
+          TOX_SKIP_ENV: "^((?!py${{ matrix.python-version }}).)*$"
         run: |
-          docker-compose -f tests/docker-compose.yml pull
-          docker-compose -f tests/docker-compose.yml build
-      - name: Run tests
-        run: |
-          pytest -c setup.cfg
-      - name: Stop Docker compose
-        run: |
-          docker-compose -f tests/docker-compose.yml down
+          tox
