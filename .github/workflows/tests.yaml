@@ -24,10 +24,10 @@ jobs:
         run: |
           tox
       - name: Install Docker Compose v2
-        run: |
-          mkdir -p ~/.docker/cli-plugins/
-          curl -SL https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
-          [[ "$(docker compose version)" = "Docker Compose version v2.2.3" ]] || exit 2
+        uses: ndeloof/install-compose-action@v0.0.1
+        with:
+          version: latest
+          legacy: true
       - name: Run compose-v2 testenvs
         env:
           TOX_SKIP_ENV: "^((?!py${{ matrix.python-version }}-pytest.-compose2).)*$"
