@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.11.0
+Changes:
+- Add support for `pytest` v7
+
 ## Version 0.10.3
 Changes:
 - Ensure that Docker cleanup is executed even with after tests have failed
