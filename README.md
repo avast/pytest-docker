@@ -114,16 +114,16 @@ your tests if you need a particular project name.
 Start all services from the docker compose file (`docker-compose up`).
 After test are finished, shutdown all services (`docker-compose down`).
 
+### `docker_setup`
+
+Get the docker_compose command to be executed for test spawn actions.
+Override this fixture in your tests if you need to change spawn actions.
+Returning anything that would evaluate to False will skip this command.
+
 ### `docker_cleanup`
 
 Get the docker_compose command to be executed for test clean-up actions.
 Override this fixture in your tests if you need to change clean-up actions.
-Returning anything that would evaluate to False will skip this command.
-
-### `docker_spawn`
-
-Get the docker_compose command to be executed for test spawn actions.
-Override this fixture in your tests if you need to change spawn actions.
 Returning anything that would evaluate to False will skip this command.
 
 # Development
