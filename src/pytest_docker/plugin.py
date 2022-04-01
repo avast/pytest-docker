@@ -158,31 +158,31 @@ def docker_cleanup():
     return get_cleanup_command()
 
 
-def get_spawn_command():
+def get_setup_command():
 
     return "up --build -d"
 
 
 @pytest.fixture(scope="session")
-def docker_spawn():
-    """Get the docker_compose command to be executed for test spawn actions.
-    Override this fixture in your tests if you need to change spawn actions.
+def docker_setup():
+    """Get the docker_compose command to be executed for test setup actions.
+    Override this fixture in your tests if you need to change setup actions.
     Returning anything that would evaluate to False will skip this command."""
 
-    return get_spawn_command()
+    return get_setup_command()
 
 
 @contextlib.contextmanager
 def get_docker_services(
-    docker_compose_file, docker_compose_project_name, docker_spawn, docker_cleanup
+    docker_compose_file, docker_compose_project_name, docker_setup, docker_cleanup
 ):
     docker_compose = DockerComposeExecutor(
         docker_compose_file, docker_compose_project_name
     )
 
-    # Spawn containers.
-    if docker_spawn:
-        docker_compose.execute(docker_spawn)
+    # setup containers.
+    if docker_setup:
+        docker_compose.execute(docker_setup)
 
     try:
         # Let test(s) run.
@@ -197,13 +197,13 @@ def get_docker_services(
 def docker_services(
     docker_compose_file,
     docker_compose_project_name,
-    docker_spawn,
+    docker_setup,
     docker_cleanup,
 ):
     """Start all services from a docker compose file (`docker-compose up`).
     After test are finished, shutdown all services (`docker-compose down`)."""
 
     with get_docker_services(
-        docker_compose_file, docker_compose_project_name, docker_spawn, docker_cleanup
+        docker_compose_file, docker_compose_project_name, docker_setup, docker_cleanup
     ) as docker_service:
         yield docker_service

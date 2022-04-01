@@ -15,5 +15,5 @@ def test_docker_compose_project(docker_compose_project_name):
 def test_docker_cleanup(docker_cleanup):
     assert docker_cleanup == "down -v"
 
-def test_docker_spawn(docker_spawn):
-    assert docker_spawn == "up --build -d"
+def test_docker_setup(docker_setup):
+    assert docker_setup == "up --build -d"
