@@ -4,6 +4,7 @@ from .plugin import (
     docker_compose_project_name,
     docker_ip,
     docker_setup,
+    docker_cleanup,
     docker_services,
 )
 
@@ -13,5 +14,6 @@ __all__ = [
     "docker_compose_project_name",
     "docker_ip",
     "docker_setup",
+    "docker_cleanup",
     "docker_services",
 ]
