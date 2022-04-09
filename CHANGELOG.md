@@ -1,8 +1,13 @@
 # Changelog
 
+## Version 0.12.0
+Changes:
+- Add `docker_setup` fixture to allow custom setup actions for docker-compose
+(contributed by @raddessi)
+
 ## Version 0.11.0
 Changes:
-- Add support for `pytest` v7
+- Add support for `pytest` v7 (contributed by @skshetry)
 
 ## Version 0.10.3
 Changes:
