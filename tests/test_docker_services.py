@@ -7,6 +7,7 @@ from pytest_docker.plugin import (
     Services,
     get_docker_services,
     get_cleanup_command,
+    get_setup_command,
 )
 
 
@@ -23,6 +24,7 @@ def test_docker_services():
         with get_docker_services(
             "docker-compose.yml",
             docker_compose_project_name="pytest123",
+            docker_setup=get_setup_command(),
             docker_cleanup=get_cleanup_command(),
         ) as services:
             assert isinstance(services, Services)
@@ -76,6 +78,7 @@ def test_docker_services_unused_port():
         with get_docker_services(
             "docker-compose.yml",
             docker_compose_project_name="pytest123",
+            docker_setup=get_setup_command(),
             docker_cleanup=get_cleanup_command(),
         ) as services:
             assert isinstance(services, Services)
@@ -127,6 +130,7 @@ def test_docker_services_failure():
             with get_docker_services(
                 "docker-compose.yml",
                 docker_compose_project_name="pytest123",
+                docker_setup=get_setup_command(),
                 docker_cleanup=get_cleanup_command(),
             ):
                 pass
