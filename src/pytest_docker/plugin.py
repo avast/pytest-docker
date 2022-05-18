@@ -90,8 +90,14 @@ class Services:
             )
 
         # This handles messy output that might contain warnings or other text
-        if len(endpoint.split("\n")) > 1:
-            endpoint = endpoint.split("\n")[-1]
+        ips = re.findall(r'\d{1,3}(?:\.\d{1,3}){3}:\d{1,5}', endpoint)
+        if len(ips) == 0:
+            raise ValueError(f'Could not found any IP in endpoint {endpoint} for "{service}:{container_port}"')
+        if len(ips) > 1:
+            raise ValueError(
+                f'Found more IPs ({",".join(ips)}) in endpoint {endpoint} for "{service}:{container_port}". '
+                f'Could not decided which port to use. ')
+        endpoint = ips[0]
 
         # Usually, the IP address here is 0.0.0.0, so we don't use it.
         match = int(endpoint.split(":", 1)[-1])
