@@ -16,6 +16,12 @@ def test_docker_ip_remote():
         assert get_docker_ip() == "1.2.3.4"
 
 
+def test_docker_ip_unix():
+    environ = {"DOCKER_HOST": "unix:///run/user/1000/podman/podman.sock"}
+    with mock.patch("os.environ", environ):
+        assert get_docker_ip() == "127.0.0.1"
+
+
 @pytest.mark.parametrize("docker_host", ["http://1.2.3.4:2376"])
 def test_docker_ip_remote_invalid(docker_host):
     environ = {"DOCKER_HOST": docker_host}
