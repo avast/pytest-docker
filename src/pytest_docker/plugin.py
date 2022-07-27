@@ -33,7 +33,7 @@ def get_docker_ip():
     # When talking to the Docker daemon via a UNIX socket, route all TCP
     # traffic to docker containers via the TCP loopback interface.
     docker_host = os.environ.get("DOCKER_HOST", "").strip()
-    if not docker_host:
+    if not docker_host or docker_host.startswith("unix://"):
         return "127.0.0.1"
 
     match = re.match(r"^tcp://(.+?):\d+$", docker_host)

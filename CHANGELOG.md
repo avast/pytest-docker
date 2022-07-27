@@ -9,6 +9,10 @@ Changes:
 - Add support for Docker Compose v2 via a new pytest fixture,
   `docker_compose_command` that should return `docker compose`.
 
+## Version 0.13.0
+Feat:
+- In get_docker_ip(), if `DOCKER_HOST` is using the `unix:` scheme then return "127.0.0.1"
+
 ## Version 0.12.0
 Changes:
 - Add `docker_setup` fixture to allow custom setup actions for docker-compose
