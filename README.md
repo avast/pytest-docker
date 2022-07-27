@@ -24,9 +24,9 @@ environment to ensure that it is available during tests. This will prevent
 potential dependency conflicts that can occur when the system wide
 `docker-compose` is used in tests.
 
-The default behavior is not to install `docker-compose` at all. If you
+The default behavior is not to install `docker-compose` with `pytest-docker`. If you
 want to, you install `pytest-docker` with the `docker-compose-v1`
-extra, you can use the following command:
+extra. You can use the following command:
 
 ```
 pip install pytest-docker[docker-compose-v1]
@@ -34,14 +34,14 @@ pip install pytest-docker[docker-compose-v1]
 
 ## Docker Compose v2 compatiblity
 
-This version of `pytest-docker` is compatible with Docker Compose v1
-(legacy) and Docker Compose v2 if you have
+`pytest-docker` will work with Docker Compose v2 out of the box if
 [`compose-switch`](https://github.com/docker/compose-switch)
-installed.
+is installed.
 
 If you want to use the real Docker Compose v2, it has to be installed
-system wide ([more
-information](https://github.com/docker/compose#linux)).
+system wide ([more information](https://github.com/docker/compose#linux))
+and you have to modify the [`docker-compose-command`](#docker_compose_command)
+fixture (this behavior might change in the future versions).
 
 # Usage
 Here is an example of a test that depends on a HTTP service.
@@ -132,6 +132,12 @@ your tests if you need a particular project name.
 Start all services from the docker compose file (`docker-compose up`).
 After test are finished, shutdown all services (`docker-compose down`).
 
+### `docker_compose_command`
+
+Docker Compose command to use to execute Dockers. Default is to use
+Docker Compose v1 (command is `docker-compose`). If you want to use
+Docker Compose v2, change this fixture to return `docker compose`.
+
 ### `docker_setup`
 
 Get the docker_compose command to be executed for test spawn actions.
@@ -144,11 +150,6 @@ Get the docker_compose command to be executed for test clean-up actions.
 Override this fixture in your tests if you need to change clean-up actions.
 Returning anything that would evaluate to False will skip this command.
 
-### `docker_compose_command`
-
-Docker Compose command to use to execute Dockers. Default is to use
-Docker Compose v1 (command is `docker-compose`). If you want to use
-Docker Compose v2, change this fixture to return `docker compose`.
 
 # Development
 Use of a virtual environment is recommended. See the
