@@ -1,11 +1,11 @@
 # Changelog
 
-## Unreleased
-Changes:
+## Version 1.0.0
+Breaking changes:
 - Default behavior is not to install `docker-compose` at all when
-  installing `pytest-docker` with PIP. If you want to, you install
-  `pytest-docker` with the `docker-compose-v1` extra (`pip install
-  pytest-docker[docker-compose-v1]`).
+  installing `pytest-docker` with PIP. Use the `docker-compose-v1` extra.
+
+Feat:
 - Add support for Docker Compose v2 via a new pytest fixture,
   `docker_compose_command` that should return `docker compose`.
 
