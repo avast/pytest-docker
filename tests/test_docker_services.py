@@ -22,6 +22,7 @@ def test_docker_services():
 
         # The fixture is a context-manager.
         with get_docker_services(
+            "docker-compose",
             "docker-compose.yml",
             docker_compose_project_name="pytest123",
             docker_setup=get_setup_command(),
@@ -76,6 +77,7 @@ def test_docker_services_unused_port():
 
         # The fixture is a context-manager.
         with get_docker_services(
+            "docker-compose",
             "docker-compose.yml",
             docker_compose_project_name="pytest123",
             docker_setup=get_setup_command(),
@@ -128,6 +130,7 @@ def test_docker_services_failure():
         # The fixture is a context-manager.
         with pytest.raises(Exception) as exc:
             with get_docker_services(
+                "docker-compose",
                 "docker-compose.yml",
                 docker_compose_project_name="pytest123",
                 docker_setup=get_setup_command(),
@@ -158,7 +161,9 @@ def test_wait_until_responsive_timeout():
 
     with mock.patch("time.sleep") as sleep:
         docker_compose = DockerComposeExecutor(
-            compose_files="docker-compose.yml", compose_project_name="pytest123"
+            compose_command="docker-compose",
+            compose_files="docker-compose.yml",
+            compose_project_name="pytest123",
         )
         services = Services(docker_compose)
         with pytest.raises(Exception) as exc:

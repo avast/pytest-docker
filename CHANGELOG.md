@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+Changes:
+- Default behavior is not to install `docker-compose` at all when
+  installing `pytest-docker` with PIP. If you want to, you install
+  `pytest-docker` with the `docker-compose-v1` extra (`pip install
+  pytest-docker[docker-compose-v1]`).
+- Add support for Docker Compose v2 via a new pytest fixture,
+  `docker_compose_command` that should return `docker compose`.
+
 ## Version 0.13.0
 Feat:
 - In get_docker_ip(), if `DOCKER_HOST` is using the `unix:` scheme then return "127.0.0.1"
