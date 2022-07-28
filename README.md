@@ -1,12 +1,13 @@
 Docker-based integration tests
 =====
+
 [![PyPI version](https://img.shields.io/pypi/v/pytest-docker?color=green)](https://pypi.org/project/pytest-docker/)
 [![Build Status](https://github.com/avast/pytest-docker/actions/workflows/tests.yaml/badge.svg?branch=master)](https://github.com/avast/pytest-docker/actions/workflows/tests.yaml)
 [![Python versions](https://img.shields.io/pypi/pyversions/pytest-docker)](https://pypi.org/project/pytest-docker/)
 [![Code style](https://img.shields.io/badge/formatted%20with-black-black)](https://github.com/psf/black)
 
-
 # Description
+
 Simple [pytest](http://doc.pytest.org/) fixtures that help you write integration
 tests with Docker and [Docker Compose](https://docs.docker.com/compose/).
 Specify all necessary containers in a `docker-compose.yml` file and and
@@ -18,6 +19,7 @@ This package is tested with Python versions `3.6`, `3.7`, `3.8` and
 `pytest-docker` was originally created by André Caron.
 
 # Installation
+
 Install `pytest-docker` with `pip` or add it to your test requirements.
 
 By default, it uses the `docker compose` command, so it relies on the Compose plugin for Docker (also called Docker Compose V2).
@@ -34,6 +36,7 @@ def docker_compose_command() -> str:
 ```
 
 If you want to use the pip-distributed version of `docker-compose` command, you can install it using
+
 ```
 pip install pytest-docker[docker-compose-v1]
 ```
@@ -41,6 +44,7 @@ pip install pytest-docker[docker-compose-v1]
 Another option could be usage of [`compose-switch`](https://github.com/docker/compose-switch).
 
 # Usage
+
 Here is an example of a test that depends on a HTTP service.
 
 With a `docker-compose.yml` file like this (using the
@@ -117,7 +121,7 @@ pytest --container-scope <scope> <test_directory>
 ```
 
 For available scopes and descriptions
-see https://docs.pytest.org/en/6.2.x/fixture.html#fixture-scopes
+see <https://docs.pytest.org/en/6.2.x/fixture.html#fixture-scopes>
 
 ### `docker_ip`
 
@@ -156,19 +160,23 @@ Get the docker_compose command to be executed for test clean-up actions.
 Override this fixture in your tests if you need to change clean-up actions.
 Returning anything that would evaluate to False will skip this command.
 
-
 # Development
+
 Use of a virtual environment is recommended. See the
 [venv](https://docs.python.org/3/library/venv.html) package for more
 information.
 
 First, install `pytest-docker` and its test dependencies:
 
-	pip install -e ".[tests]"
+```bash
+pip install -e ".[tests]"
+```
 
 Run tests with
 
-	pytest -c setup.cfg
+```bash
+pytest -c setup.cfg
+```
 
 to make sure that the correct configuration is used. This is also how tests are
 run in CI.
@@ -177,9 +185,9 @@ Use [black](https://pypi.org/project/black/) with default settings for
 formatting. You can also use `pylint` with `setup.cfg` as the configuration
 file.
 
-
 # Contributing
-This pytest plug-in and its source code are made available to you under a MIT
+
+This `pytest` plug-in and its source code are made available to you under a MIT
 license. It is safe to use in commercial and closed-source applications. Read
 the license for details!
 
