@@ -10,6 +10,16 @@ import attr
 import pytest
 
 
+class PytestDockerError(Exception):
+    """Base pytest-docker exception."""
+
+
+class ServiceTimeoutError(PytestDockerError):
+    """
+    Timed out while waiting for Docker service(s).
+    """
+
+
 def execute(command, success_codes=(0,)):
     """Run a shell command."""
     try:
@@ -105,7 +115,7 @@ class Services:
             time.sleep(pause)
             now = clock()
 
-        raise Exception("Timeout reached while waiting on service!")
+        raise ServiceTimeoutError("Timeout reached while waiting on service!")
 
 
 def str_to_list(arg):
