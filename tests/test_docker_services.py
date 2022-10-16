@@ -5,6 +5,7 @@ import pytest
 from pytest_docker.plugin import (
     DockerComposeExecutor,
     Services,
+    ServiceTimeoutError,
     get_docker_services,
     get_cleanup_command,
     get_setup_command,
@@ -166,7 +167,7 @@ def test_wait_until_responsive_timeout():
             compose_project_name="pytest123",
         )
         services = Services(docker_compose)
-        with pytest.raises(Exception) as exc:
+        with pytest.raises(ServiceTimeoutError) as exc:
             print(
                 services.wait_until_responsive(
                     check=lambda: False, timeout=3.0, pause=1.0, clock=clock
