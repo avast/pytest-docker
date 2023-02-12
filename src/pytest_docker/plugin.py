@@ -33,7 +33,7 @@ def get_docker_ip():
     # When talking to the Docker daemon via a UNIX socket, route all TCP
     # traffic to docker containers via the TCP loopback interface.
     docker_host = os.environ.get("DOCKER_HOST", "").strip()
-    if not docker_host:
+    if not docker_host or docker_host.startswith("unix://"):
         return "127.0.0.1"
 
     match = re.match(r"^tcp://(.+?):\d+$", docker_host)
@@ -117,15 +117,25 @@ def str_to_list(arg):
 @attr.s(frozen=True)
 class DockerComposeExecutor:
 
+    _compose_command = attr.ib()
     _compose_files = attr.ib(converter=str_to_list)
     _compose_project_name = attr.ib()
 
     def execute(self, subcommand):
-        command = "docker-compose"
+        command = self._compose_command
         for compose_file in self._compose_files:
             command += ' -f "{}"'.format(compose_file)
         command += ' -p "{}" {}'.format(self._compose_project_name, subcommand)
         return execute(command)
+
+
+@pytest.fixture(scope="session")
+def docker_compose_command():
+    """Docker Compose command to use, it could be either `docker-compose`
+    for Docker Compose v1 or `docker compose` for Docker Compose
+    v2."""
+
+    return "docker-compose"
 
 
 @pytest.fixture(scope="session")
@@ -188,37 +198,68 @@ def get_cleanup_command():
 @pytest.fixture(scope="session")
 def docker_cleanup():
     """Get the docker_compose command to be executed for test clean-up actions.
-     Override this fixture in your tests if you need to change clean-up actions."""
+    Override this fixture in your tests if you need to change clean-up actions.
+    Returning anything that would evaluate to False will skip this command."""
 
     return get_cleanup_command()
 
 
+def get_setup_command():
+
+    return "up --build -d"
+
+
+@pytest.fixture(scope="session")
+def docker_setup():
+    """Get the docker_compose command to be executed for test setup actions.
+    Override this fixture in your tests if you need to change setup actions.
+    Returning anything that would evaluate to False will skip this command."""
+
+    return get_setup_command()
+
+
 @contextlib.contextmanager
 def get_docker_services(
-    docker_compose_file, docker_compose_project_name, docker_cleanup
+    docker_compose_command,
+    docker_compose_file,
+    docker_compose_project_name,
+    docker_setup,
+    docker_cleanup,
 ):
     docker_compose = DockerComposeExecutor(
-        docker_compose_file, docker_compose_project_name
+        docker_compose_command, docker_compose_file, docker_compose_project_name
     )
 
-    # Spawn containers.
-    docker_compose.execute("up --build -d")
+    # setup containers.
+    if docker_setup:
+        docker_compose.execute(docker_setup)
 
     try:
         # Let test(s) run.
         yield Services(docker_compose)
     finally:
         # Clean up.
-        docker_compose.execute(docker_cleanup)
+        if docker_cleanup:
+            docker_compose.execute(docker_cleanup)
 
 
 @pytest.fixture(scope="session")
-def docker_services(docker_compose_file, docker_compose_project_name, docker_cleanup):
+def docker_services(
+    docker_compose_command,
+    docker_compose_file,
+    docker_compose_project_name,
+    docker_setup,
+    docker_cleanup,
+):
     """Start all services from a docker compose file (`docker-compose up`).
     After test are finished, shutdown all services (`docker-compose down`)."""
 
     with get_docker_services(
-        docker_compose_file, docker_compose_project_name, docker_cleanup
+        docker_compose_command,
+        docker_compose_file,
+        docker_compose_project_name,
+        docker_setup,
+        docker_cleanup,
     ) as docker_service:
         yield docker_service
 

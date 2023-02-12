@@ -1,5 +1,31 @@
 # Changelog
 
+## Version 1.0.1
+Chore:
+- Set dependency on `attrs` to be the same as in `pytest`
+
+## Version 1.0.0
+Breaking changes:
+- Default behavior is not to install `docker-compose` at all when
+  installing `pytest-docker` with PIP. Use the `docker-compose-v1` extra.
+
+Feat:
+- Add support for Docker Compose v2 via a new pytest fixture,
+  `docker_compose_command` that should return `docker compose`.
+
+## Version 0.13.0
+Feat:
+- In get_docker_ip(), if `DOCKER_HOST` is using the `unix:` scheme then return "127.0.0.1"
+
+## Version 0.12.0
+Changes:
+- Add `docker_setup` fixture to allow custom setup actions for docker-compose
+(contributed by @raddessi)
+
+## Version 0.11.0
+Changes:
+- Add support for `pytest` v7 (contributed by @skshetry)
+
 ## Version 0.10.3
 Changes:
 - Ensure that Docker cleanup is executed even with after tests have failed
