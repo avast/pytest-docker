@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 2.0.0
+Breaking changes:
+- Default command changed from `docker-compose` to `docker compose`, so the V2 is the default one.
+
 ## Version 1.0.1
 Chore:
 - Set dependency on `attrs` to be the same as in `pytest`

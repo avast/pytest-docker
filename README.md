@@ -8,7 +8,7 @@ Docker-based integration tests
 
 # Description
 Simple [pytest](http://doc.pytest.org/) fixtures that help you write integration
-tests with Docker and [docker-compose](https://docs.docker.com/compose/).
+tests with Docker and [Docker Compose](https://docs.docker.com/compose/).
 Specify all necessary containers in a `docker-compose.yml` file and and
 `pytest-docker` will spin them up for the duration of your tests.
 
@@ -18,30 +18,27 @@ This package is tested with Python versions `3.6`, `3.7`, `3.8` and
 `pytest-docker` was originally created by André Caron.
 
 # Installation
-Install `pytest-docker` with `pip` or add it to your test requirements. It is
-recommended to install `docker-compose` python package directly in your
-environment to ensure that it is available during tests. This will prevent
-potential dependency conflicts that can occur when the system wide
-`docker-compose` is used in tests.
+Install `pytest-docker` with `pip` or add it to your test requirements.
 
-The default behavior is not to install `docker-compose` with `pytest-docker`. If you
-want to, you install `pytest-docker` with the `docker-compose-v1`
-extra. You can use the following command:
+By default, it uses the `docker compose` command, so it relies on the Compose plugin for Docker (also called Docker Compose V2).
 
+## Docker Compose V1 compatibility
+
+If you want to use the old `docker-compose` command (deprecated since July 2023, not receiving updates since 2021)
+ then you can do it using the [`docker-compose-command`](#docker_compose_command) fixture:
+
+```python
+@pytest.fixture(scope="session")
+def docker_compose_command() -> str:
+    return "docker-compose"
+```
+
+If you want to use the pip-distributed version of `docker-compose` command, you can install it using
 ```
 pip install pytest-docker[docker-compose-v1]
 ```
 
-## Docker Compose v2 compatiblity
-
-`pytest-docker` will work with Docker Compose v2 out of the box if
-[`compose-switch`](https://github.com/docker/compose-switch)
-is installed.
-
-If you want to use the real Docker Compose v2, it has to be installed
-system wide ([more information](https://github.com/docker/compose#linux))
-and you have to modify the [`docker-compose-command`](#docker_compose_command)
-fixture (this behavior might change in the future versions).
+Another option could be usage of [`compose-switch`](https://github.com/docker/compose-switch).
 
 # Usage
 Here is an example of a test that depends on a HTTP service.
@@ -135,8 +132,8 @@ After test are finished, shutdown all services (`docker-compose down`).
 ### `docker_compose_command`
 
 Docker Compose command to use to execute Dockers. Default is to use
-Docker Compose v1 (command is `docker-compose`). If you want to use
-Docker Compose v2, change this fixture to return `docker compose`.
+Docker Compose V2 (command is `docker compose`). If you want to use
+Docker Compose V1, change this fixture to return `docker-compose`.
 
 ### `docker_setup`
 
