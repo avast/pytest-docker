@@ -22,14 +22,6 @@ Install `pytest-docker` with `pip` or add it to your test requirements.
 
 By default, it uses the `docker compose` command, so it relies on the Compose plugin for Docker (also called Docker Compose V2).
 
-The default behavior is not to install `docker-compose` with `pytest-docker`. If you
-want to, you install `pytest-docker` with the `docker-compose-v1`
-extra. You can use the following command:
-
-```
-pip install pytest-docker[docker-compose-v1]
-```
-
 ## Docker Compose V1 compatibility
 
 If you want to use the old `docker-compose` command (deprecated since July 2023, not receiving updates since 2021)
