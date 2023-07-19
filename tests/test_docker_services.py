@@ -22,7 +22,7 @@ def test_docker_services():
 
         # The fixture is a context-manager.
         with get_docker_services(
-            "docker-compose",
+            "docker compose",
             "docker-compose.yml",
             docker_compose_project_name="pytest123",
             docker_setup=get_setup_command(),
@@ -49,17 +49,17 @@ def test_docker_services():
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" -p "pytest123" up --build -d',
+            'docker compose -f "docker-compose.yml" -p "pytest123" up --build -d',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" -p "pytest123" port abc 123',
+            'docker compose -f "docker-compose.yml" -p "pytest123" port abc 123',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" -p "pytest123" down -v',
+            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
@@ -77,7 +77,7 @@ def test_docker_services_unused_port():
 
         # The fixture is a context-manager.
         with get_docker_services(
-            "docker-compose",
+            "docker compose",
             "docker-compose.yml",
             docker_compose_project_name="pytest123",
             docker_setup=get_setup_command(),
@@ -101,17 +101,17 @@ def test_docker_services_unused_port():
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" -p "pytest123" ' "up --build -d",
+            'docker compose -f "docker-compose.yml" -p "pytest123" ' "up --build -d",
             shell=True,
             stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" -p "pytest123" ' "port abc 123",
+            'docker compose -f "docker-compose.yml" -p "pytest123" ' "port abc 123",
             shell=True,
             stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker-compose -f "docker-compose.yml" -p "pytest123" down -v',
+            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
             shell=True,
             stderr=subprocess.STDOUT,
         ),
@@ -130,7 +130,7 @@ def test_docker_services_failure():
         # The fixture is a context-manager.
         with pytest.raises(Exception) as exc:
             with get_docker_services(
-                "docker-compose",
+                "docker compose",
                 "docker-compose.yml",
                 docker_compose_project_name="pytest123",
                 docker_setup=get_setup_command(),
@@ -148,7 +148,7 @@ def test_docker_services_failure():
     # Tear down code should not be called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker-compose -f "docker-compose.yml" -p "pytest123" ' "up --build -d",
+            'docker compose -f "docker-compose.yml" -p "pytest123" ' "up --build -d",
             shell=True,
             stderr=subprocess.STDOUT,
         )
@@ -161,7 +161,7 @@ def test_wait_until_responsive_timeout():
 
     with mock.patch("time.sleep") as sleep:
         docker_compose = DockerComposeExecutor(
-            compose_command="docker-compose",
+            compose_command="docker compose",
             compose_files="docker-compose.yml",
             compose_project_name="pytest123",
         )
