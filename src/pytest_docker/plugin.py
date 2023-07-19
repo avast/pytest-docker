@@ -131,11 +131,11 @@ class DockerComposeExecutor:
 
 @pytest.fixture(scope="session")
 def docker_compose_command():
-    """Docker Compose command to use, it could be either `docker-compose`
-    for Docker Compose v1 or `docker compose` for Docker Compose
-    v2."""
+    """Docker Compose command to use, it could be either `docker compose`
+    for Docker Compose V2 or `docker-compose` for Docker Compose
+    V1."""
 
-    return "docker-compose"
+    return "docker compose"
 
 
 @pytest.fixture(scope="session")
