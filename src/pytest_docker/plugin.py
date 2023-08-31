@@ -87,7 +87,7 @@ class Services:
             endpoint = endpoint.split("\n")[-1]
 
         # Usually, the IP address here is 0.0.0.0, so we don't use it.
-        match = int(endpoint.split(":", 1)[1])
+        match = int(endpoint.split(":", 1)[-1])
 
         # Store it in cache in case we request it multiple times.
         self._services.setdefault(service, {})[container_port] = match
