@@ -150,13 +150,13 @@ Docker Compose V1, change this fixture to return `docker-compose`.
 
 ### `docker_setup`
 
-Get the docker_compose command to be executed for test spawn actions.
+Get the list of docker_compose commands to be executed for test spawn actions.
 Override this fixture in your tests if you need to change spawn actions.
 Returning anything that would evaluate to False will skip this command.
 
 ### `docker_cleanup`
 
-Get the docker_compose command to be executed for test clean-up actions.
+Get the list of docker_compose commands to be executed for test clean-up actions.
 Override this fixture in your tests if you need to change clean-up actions.
 Returning anything that would evaluate to False will skip this command.
 

@@ -174,3 +174,121 @@ def test_wait_until_responsive_timeout():
             )
         assert sleep.call_args_list == [mock.call(1.0), mock.call(1.0), mock.call(1.0)]
     assert str(exc.value) == ("Timeout reached while waiting on service!")
+
+
+def test_single_commands():
+    """Ensures backwards compatibility with single command strings for setup and cleanup."""
+
+    with mock.patch("subprocess.check_output") as check_output:
+        check_output.returncode = 0
+
+        assert check_output.call_count == 0
+
+        # The fixture is a context-manager.
+        with get_docker_services(
+            "docker compose",
+            "docker-compose.yml",
+            docker_compose_project_name="pytest123",
+            docker_setup="up --build -d",
+            docker_cleanup="down -v",
+        ) as services:
+            assert isinstance(services, Services)
+
+            assert check_output.call_count == 1
+
+            # Can request port for services.
+            port = services.port_for("hello", 80)
+            assert port == 1
+
+            assert check_output.call_count == 2
+
+            # 2nd request for same service should hit the cache.
+            port = services.port_for("hello", 80)
+            assert port == 1
+
+            assert check_output.call_count == 2
+
+        assert check_output.call_count == 3
+
+    # Both should have been called.
+    assert check_output.call_args_list == [
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" up --build -d',
+            stderr=subprocess.STDOUT,
+            shell=True,
+        ),
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" port hello 80',
+            stderr=subprocess.STDOUT,
+            shell=True,
+        ),
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
+            stderr=subprocess.STDOUT,
+            shell=True,
+        ),
+    ]
+
+
+def test_multiple_commands():
+    """Multiple startup and cleanup commands should be executed."""
+
+    with mock.patch("subprocess.check_output") as check_output:
+        check_output.returncode = 0
+
+        assert check_output.call_count == 0
+
+        # The fixture is a context-manager.
+        with get_docker_services(
+            "docker compose",
+            "docker-compose.yml",
+            docker_compose_project_name="pytest123",
+            docker_setup=["ps", "up --build -d"],
+            docker_cleanup=["down -v", "ps"],
+        ) as services:
+            assert isinstance(services, Services)
+
+            assert check_output.call_count == 2
+
+            # Can request port for services.
+            port = services.port_for("hello", 80)
+            assert port == 1
+
+            assert check_output.call_count == 3
+
+            # 2nd request for same service should hit the cache.
+            port = services.port_for("hello", 80)
+            assert port == 1
+
+            assert check_output.call_count == 3
+
+        assert check_output.call_count == 5
+
+    # Both should have been called.
+    assert check_output.call_args_list == [
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" ps',
+            stderr=subprocess.STDOUT,
+            shell=True,
+        ),
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" up --build -d',
+            stderr=subprocess.STDOUT,
+            shell=True,
+        ),
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" port hello 80',
+            stderr=subprocess.STDOUT,
+            shell=True,
+        ),
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
+            stderr=subprocess.STDOUT,
+            shell=True,
+        ),
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" ps',
+            stderr=subprocess.STDOUT,
+            shell=True,
+        ),
+    ]
