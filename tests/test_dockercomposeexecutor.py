@@ -6,9 +6,7 @@ from pytest_docker.plugin import DockerComposeExecutor
 
 
 def test_execute():
-    docker_compose = DockerComposeExecutor(
-        "docker compose", "docker-compose.yml", "pytest123"
-    )
+    docker_compose = DockerComposeExecutor("docker compose", "docker-compose.yml", "pytest123")
     with mock.patch("subprocess.check_output") as check_output:
         docker_compose.execute("up")
         assert check_output.call_args_list == [
@@ -21,9 +19,7 @@ def test_execute():
 
 
 def test_execute_docker_compose_v2():
-    docker_compose = DockerComposeExecutor(
-        "docker compose", "docker-compose.yml", "pytest123"
-    )
+    docker_compose = DockerComposeExecutor("docker compose", "docker-compose.yml", "pytest123")
     with mock.patch("subprocess.check_output") as check_output:
         docker_compose.execute("up")
         assert check_output.call_args_list == [

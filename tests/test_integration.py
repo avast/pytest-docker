@@ -5,8 +5,10 @@ from os import path
 import requests
 from requests.exceptions import ConnectionError
 
+from src.pytest_docker.plugin import Services
 
-def is_responsive(url):
+
+def is_responsive(url: str):
     """Check if something responds to ``url``."""
     try:
         response = requests.get(url)
@@ -16,7 +18,7 @@ def is_responsive(url):
         return False
 
 
-def test_main_fixtures_work(docker_ip, docker_services):
+def test_main_fixtures_work(docker_ip: str, docker_services: Services):
     """Showcase the power of our Docker fixtures!"""
 
     # Build URL to service listening on random port.
@@ -32,7 +34,9 @@ def test_main_fixtures_work(docker_ip, docker_services):
     assert response.status_code == 204
 
 
-def test_containers_and_volumes_get_cleaned_up(testdir, tmpdir, docker_compose_file):
+def test_containers_and_volumes_get_cleaned_up(
+    testdir: str, tmpdir: str, docker_compose_file: str
+):
     _copy_compose_files_to_testdir(testdir, docker_compose_file)
 
     project_name_file_path = path.join(str(tmpdir), "project_name.txt")
@@ -73,23 +77,19 @@ def test_containers_and_volumes_get_cleaned_up(testdir, tmpdir, docker_compose_f
     _check_container_is_gone(compose_project_name)
 
 
-def _copy_compose_files_to_testdir(testdir, compose_file_path):
+def _copy_compose_files_to_testdir(testdir: str, compose_file_path: str):
     directory_for_compose_files = testdir.mkdir("tests")
     shutil.copy(compose_file_path, str(directory_for_compose_files))
 
-    container_build_files_dir = path.realpath(
-        path.join(compose_file_path, "../containers")
-    )
-    shutil.copytree(
-        container_build_files_dir, str(directory_for_compose_files) + "/containers"
-    )
+    container_build_files_dir = path.realpath(path.join(compose_file_path, "../containers"))
+    shutil.copytree(container_build_files_dir, str(directory_for_compose_files) + "/containers")
 
 
-def _check_volume_is_gone(project_name):
+def _check_volume_is_gone(project_name: str):
     check_proc = subprocess.Popen("docker volume ls".split(), stdout=subprocess.PIPE)
     assert project_name.encode() not in check_proc.stdout.read()
 
 
-def _check_container_is_gone(project_name):
+def _check_container_is_gone(project_name: str):
     check_proc = subprocess.Popen("docker ps".split(), stdout=subprocess.PIPE)
     assert project_name.encode() not in check_proc.stdout.read()

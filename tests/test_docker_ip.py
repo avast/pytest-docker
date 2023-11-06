@@ -28,6 +28,4 @@ def test_docker_ip_remote_invalid(docker_host):
     with mock.patch("os.environ", environ):
         with pytest.raises(ValueError) as exc:
             print(get_docker_ip())
-        assert str(exc.value) == (
-            'Invalid value for DOCKER_HOST: "%s".' % (docker_host,)
-        )
+        assert str(exc.value) == ('Invalid value for DOCKER_HOST: "%s".' % (docker_host,))

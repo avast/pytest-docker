@@ -5,8 +5,8 @@ import pytest
 from pytest_docker.plugin import (
     DockerComposeExecutor,
     Services,
-    get_docker_services,
     get_cleanup_command,
+    get_docker_services,
     get_setup_command,
 )
 
@@ -90,9 +90,7 @@ def test_docker_services_unused_port():
             # Can request port for services.
             with pytest.raises(ValueError) as exc:
                 print(services.port_for("abc", 123))
-            assert str(exc.value) == (
-                'Could not detect port for "%s:%d".' % ("abc", 123)
-            )
+            assert str(exc.value) == ('Could not detect port for "%s:%d".' % ("abc", 123))
 
             assert check_output.call_count == 2
 
@@ -122,9 +120,7 @@ def test_docker_services_failure():
     """Propagate failure to start service."""
 
     with mock.patch("subprocess.check_output") as check_output:
-        check_output.side_effect = [
-            subprocess.CalledProcessError(1, "the command", b"the output")
-        ]
+        check_output.side_effect = [subprocess.CalledProcessError(1, "the command", b"the output")]
         check_output.returncode = 1
 
         # The fixture is a context-manager.

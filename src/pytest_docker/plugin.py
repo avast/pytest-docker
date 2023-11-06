@@ -4,13 +4,14 @@ import re
 import subprocess
 import time
 import timeit
+from collections.abc import Callable
+from typing import Any, Iterable
 
 import attr
-
 import pytest
 
 
-def execute(command, success_codes=(0,)):
+def execute(command: str, success_codes: Iterable[int] = (0,)):
     """Run a shell command."""
     try:
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
@@ -22,9 +23,7 @@ def execute(command, success_codes=(0,)):
 
     if status not in success_codes:
         raise Exception(
-            'Command {} returned {}: """{}""".'.format(
-                command, status, output.decode("utf-8")
-            )
+            'Command {} returned {}: """{}""".'.format(command, status, output.decode("utf-8"))
         )
     return output
 
@@ -51,11 +50,10 @@ def docker_ip():
 
 @attr.s(frozen=True)
 class Services:
-
     _docker_compose = attr.ib()
-    _services = attr.ib(init=False, default=attr.Factory(dict))
+    _services: dict[Any, dict[Any, Any]] = attr.ib(init=False, default=attr.Factory(dict))
 
-    def port_for(self, service, container_port):
+    def port_for(self, service: str, container_port: int):
         """Return the "host" port for `service` and `container_port`.
 
         E.g. If the service is defined like this:
@@ -78,9 +76,7 @@ class Services:
         output = self._docker_compose.execute("port %s %d" % (service, container_port))
         endpoint = output.strip().decode("utf-8")
         if not endpoint:
-            raise ValueError(
-                'Could not detect port for "%s:%d".' % (service, container_port)
-            )
+            raise ValueError('Could not detect port for "%s:%d".' % (service, container_port))
 
         # This handles messy output that might contain warnings or other text
         if len(endpoint.split("\n")) > 1:
@@ -94,7 +90,13 @@ class Services:
 
         return match
 
-    def wait_until_responsive(self, check, timeout, pause, clock=timeit.default_timer):
+    def wait_until_responsive(
+        self,
+        check: Callable[[], bool],
+        timeout: float,
+        pause: float,
+        clock: Callable[[], float] = timeit.default_timer,
+    ):
         """Wait until a service is responsive."""
 
         ref = clock()
@@ -108,7 +110,7 @@ class Services:
         raise Exception("Timeout reached while waiting on service!")
 
 
-def str_to_list(arg):
+def str_to_list(arg: str | list[Any] | tuple[Any]):
     if isinstance(arg, (list, tuple)):
         return arg
     return [arg]
@@ -116,12 +118,11 @@ def str_to_list(arg):
 
 @attr.s(frozen=True)
 class DockerComposeExecutor:
+    _compose_command: str = attr.ib()
+    _compose_files: list[str] = attr.ib(converter=str_to_list)
+    _compose_project_name: str = attr.ib()
 
-    _compose_command = attr.ib()
-    _compose_files = attr.ib(converter=str_to_list)
-    _compose_project_name = attr.ib()
-
-    def execute(self, subcommand):
+    def execute(self, subcommand: str):
         command = self._compose_command
         for compose_file in self._compose_files:
             command += ' -f "{}"'.format(compose_file)
@@ -155,7 +156,6 @@ def docker_compose_project_name():
 
 
 def get_cleanup_command():
-
     return "down -v"
 
 
@@ -169,7 +169,6 @@ def docker_cleanup():
 
 
 def get_setup_command():
-
     return "up --build -d"
 
 
@@ -184,11 +183,11 @@ def docker_setup():
 
 @contextlib.contextmanager
 def get_docker_services(
-    docker_compose_command,
-    docker_compose_file,
-    docker_compose_project_name,
-    docker_setup,
-    docker_cleanup,
+    docker_compose_command: str,
+    docker_compose_file: list[str],
+    docker_compose_project_name: str,
+    docker_setup: str,
+    docker_cleanup: str,
 ):
     docker_compose = DockerComposeExecutor(
         docker_compose_command, docker_compose_file, docker_compose_project_name
@@ -209,11 +208,11 @@ def get_docker_services(
 
 @pytest.fixture(scope="session")
 def docker_services(
-    docker_compose_command,
-    docker_compose_file,
-    docker_compose_project_name,
-    docker_setup,
-    docker_cleanup,
+    docker_compose_command: str,
+    docker_compose_file: list[str],
+    docker_compose_project_name: str,
+    docker_setup: str,
+    docker_cleanup: str,
 ):
     """Start all services from a docker compose file (`docker-compose up`).
     After test are finished, shutdown all services (`docker-compose down`)."""
