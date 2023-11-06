@@ -5,13 +5,14 @@ import subprocess
 import time
 import timeit
 from collections.abc import Callable
-from typing import Any, Iterable
+from typing import Any, Dict, Iterable, Iterator, List, Tuple, Union
 
 import attr
+import py
 import pytest
 
 
-def execute(command: str, success_codes: Iterable[int] = (0,)):
+def execute(command: str, success_codes: Iterable[int] = (0,)) -> Union[bytes, Any]:
     """Run a shell command."""
     try:
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
@@ -28,7 +29,7 @@ def execute(command: str, success_codes: Iterable[int] = (0,)):
     return output
 
 
-def get_docker_ip():
+def get_docker_ip() -> Union[str, Any]:
     # When talking to the Docker daemon via a UNIX socket, route all TCP
     # traffic to docker containers via the TCP loopback interface.
     docker_host = os.environ.get("DOCKER_HOST", "").strip()
@@ -42,7 +43,7 @@ def get_docker_ip():
 
 
 @pytest.fixture(scope="session")
-def docker_ip():
+def docker_ip() -> Union[str, Any]:
     """Determine the IP address for TCP connections to Docker containers."""
 
     return get_docker_ip()
@@ -50,10 +51,10 @@ def docker_ip():
 
 @attr.s(frozen=True)
 class Services:
-    _docker_compose = attr.ib()
-    _services: dict[Any, dict[Any, Any]] = attr.ib(init=False, default=attr.Factory(dict))
+    _docker_compose: Any = attr.ib()
+    _services: Dict[Any, Dict[Any, Any]] = attr.ib(init=False, default=attr.Factory(dict))
 
-    def port_for(self, service: str, container_port: int):
+    def port_for(self, service: str, container_port: int) -> int:
         """Return the "host" port for `service` and `container_port`.
 
         E.g. If the service is defined like this:
@@ -69,7 +70,7 @@ class Services:
         """
 
         # Lookup in the cache.
-        cache = self._services.get(service, {}).get(container_port, None)
+        cache: int = self._services.get(service, {}).get(container_port, None)
         if cache is not None:
             return cache
 
@@ -92,11 +93,11 @@ class Services:
 
     def wait_until_responsive(
         self,
-        check: Callable[[], bool],
+        check: Any,
         timeout: float,
         pause: float,
-        clock: Callable[[], float] = timeit.default_timer,
-    ):
+        clock: Any = timeit.default_timer,
+    ) -> None:
         """Wait until a service is responsive."""
 
         ref = clock()
@@ -110,7 +111,7 @@ class Services:
         raise Exception("Timeout reached while waiting on service!")
 
 
-def str_to_list(arg: str | list[Any] | tuple[Any]):
+def str_to_list(arg: Union[str, List[Any], Tuple[Any]]) -> Union[List[Any], Tuple[Any]]:
     if isinstance(arg, (list, tuple)):
         return arg
     return [arg]
@@ -119,10 +120,10 @@ def str_to_list(arg: str | list[Any] | tuple[Any]):
 @attr.s(frozen=True)
 class DockerComposeExecutor:
     _compose_command: str = attr.ib()
-    _compose_files: list[str] = attr.ib(converter=str_to_list)
+    _compose_files: Any= attr.ib(converter=str_to_list)
     _compose_project_name: str = attr.ib()
 
-    def execute(self, subcommand: str):
+    def execute(self, subcommand: str) -> Union[bytes, Any]:
         command = self._compose_command
         for compose_file in self._compose_files:
             command += ' -f "{}"'.format(compose_file)
@@ -131,7 +132,7 @@ class DockerComposeExecutor:
 
 
 @pytest.fixture(scope="session")
-def docker_compose_command():
+def docker_compose_command() -> str:
     """Docker Compose command to use, it could be either `docker compose`
     for Docker Compose V2 or `docker-compose` for Docker Compose
     V1."""
@@ -140,7 +141,7 @@ def docker_compose_command():
 
 
 @pytest.fixture(scope="session")
-def docker_compose_file(pytestconfig):
+def docker_compose_file(pytestconfig: Any) -> str:
     """Get an absolute path to the  `docker-compose.yml` file. Override this
     fixture in your tests if you need a custom location."""
 
@@ -148,19 +149,19 @@ def docker_compose_file(pytestconfig):
 
 
 @pytest.fixture(scope="session")
-def docker_compose_project_name():
+def docker_compose_project_name() -> str:
     """Generate a project name using the current process PID. Override this
     fixture in your tests if you need a particular project name."""
 
     return "pytest{}".format(os.getpid())
 
 
-def get_cleanup_command():
+def get_cleanup_command() -> str:
     return "down -v"
 
 
 @pytest.fixture(scope="session")
-def docker_cleanup():
+def docker_cleanup() -> str:
     """Get the docker_compose command to be executed for test clean-up actions.
     Override this fixture in your tests if you need to change clean-up actions.
     Returning anything that would evaluate to False will skip this command."""
@@ -168,12 +169,12 @@ def docker_cleanup():
     return get_cleanup_command()
 
 
-def get_setup_command():
+def get_setup_command() -> str:
     return "up --build -d"
 
 
 @pytest.fixture(scope="session")
-def docker_setup():
+def docker_setup() -> str:
     """Get the docker_compose command to be executed for test setup actions.
     Override this fixture in your tests if you need to change setup actions.
     Returning anything that would evaluate to False will skip this command."""
@@ -184,11 +185,11 @@ def docker_setup():
 @contextlib.contextmanager
 def get_docker_services(
     docker_compose_command: str,
-    docker_compose_file: list[str],
+    docker_compose_file: str,
     docker_compose_project_name: str,
     docker_setup: str,
     docker_cleanup: str,
-):
+) -> Iterator[Services]:
     docker_compose = DockerComposeExecutor(
         docker_compose_command, docker_compose_file, docker_compose_project_name
     )
@@ -209,11 +210,11 @@ def get_docker_services(
 @pytest.fixture(scope="session")
 def docker_services(
     docker_compose_command: str,
-    docker_compose_file: list[str],
+    docker_compose_file: str,
     docker_compose_project_name: str,
     docker_setup: str,
     docker_cleanup: str,
-):
+) -> Iterator[Services]:
     """Start all services from a docker compose file (`docker-compose up`).
     After test are finished, shutdown all services (`docker-compose down`)."""
 

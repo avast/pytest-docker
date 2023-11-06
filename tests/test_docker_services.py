@@ -11,7 +11,7 @@ from pytest_docker.plugin import (
 )
 
 
-def test_docker_services():
+def test_docker_services() -> None:
     """Automatic teardown of all services."""
 
     with mock.patch("subprocess.check_output") as check_output:
@@ -66,7 +66,7 @@ def test_docker_services():
     ]
 
 
-def test_docker_services_unused_port():
+def test_docker_services_unused_port() -> None:
     """Complain loudly when the requested port is not used by the service."""
 
     with mock.patch("subprocess.check_output") as check_output:
@@ -116,7 +116,7 @@ def test_docker_services_unused_port():
     ]
 
 
-def test_docker_services_failure():
+def test_docker_services_failure() -> None:
     """Propagate failure to start service."""
 
     with mock.patch("subprocess.check_output") as check_output:
@@ -151,7 +151,7 @@ def test_docker_services_failure():
     ]
 
 
-def test_wait_until_responsive_timeout():
+def test_wait_until_responsive_timeout() -> None:
     clock = mock.MagicMock()
     clock.side_effect = [0.0, 1.0, 2.0, 3.0]
 
@@ -164,7 +164,7 @@ def test_wait_until_responsive_timeout():
         services = Services(docker_compose)
         with pytest.raises(Exception) as exc:
             print(
-                services.wait_until_responsive(
+                services.wait_until_responsive(  # type: ignore
                     check=lambda: False, timeout=3.0, pause=1.0, clock=clock
                 )
             )

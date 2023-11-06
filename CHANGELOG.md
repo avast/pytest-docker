@@ -70,7 +70,7 @@ Changes:
 - Package cleanup
 
 ## Version 0.6.0
-- Added ability to return list of files from `docker_compose_file` fixture
+- Added ability to return List of files from `docker_compose_file` fixture
 
 ## Version 0.3.0
 - Added `--build` option to `docker-compose up` command to automatically
