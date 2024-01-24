@@ -27,7 +27,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         "--container-scope",
         type=str,
         action="store",
-        default="module",
+        default="session",
         help="The pytest fixture scope for reusing containers between tests."
         " For available scopes and descriptions, see https://docs.pytest.org/en/6.2.x/fixture.html#fixture-scopes",
     )
