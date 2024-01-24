@@ -1,3 +1,4 @@
+import pytest
 import os.path
 
 
@@ -20,3 +21,39 @@ def test_docker_setup(docker_setup):
 
 def test_docker_compose_comand(docker_compose_command):
     assert docker_compose_command == "docker compose"
+
+def test_default_container_scope(pytester):
+    pytester.makepyfile(
+    """
+        import pytest
+        @pytest.fixture(scope="module")
+        def dummy(docker_cleanup):
+            return True
+
+        def test_default_container_scope(dummy):
+            assert dummy == True
+    """
+    )
+
+    result =pytester.runpytest()
+    result.assert_outcomes(passed=1)
+
+def test_general_container_scope(testdir, request):
+    params = ["--container-scope=session"]
+    assert request.config.pluginmanager.hasplugin('docker')
+
+
+    testdir.makepyfile(
+    """
+        import pytest
+        @pytest.fixture(scope="session")
+        def dummy(docker_cleanup):
+            return True
+
+        def test_default_container_scope(dummy):
+            assert dummy == True
+    """
+    )
+
+    result = testdir.runpytest(*params)
+    result.assert_outcomes(passed=1)
