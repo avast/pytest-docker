@@ -108,7 +108,16 @@ def docker_compose_file(pytestconfig):
 ```
 
 ## Available fixtures
-All fixtures have `session` scope.
+
+By default the scope of the fixtures are `session` but can be changed with
+`pytest` command line option `--container-scope <scope>`:
+
+```bash
+pytest --container-scope <scope> <test_directory>
+```
+
+For available scopes and descriptions
+see https://docs.pytest.org/en/6.2.x/fixture.html#fixture-scopes
 
 ### `docker_ip`
 
