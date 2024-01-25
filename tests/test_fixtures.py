@@ -1,4 +1,5 @@
 import os.path
+import pytest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -27,7 +28,7 @@ def test_default_container_scope(pytester):
     pytester.makepyfile(
         """
         import pytest
-        @pytest.fixture(scope="module")
+        @pytest.fixture(scope="session")
         def dummy(docker_cleanup):
             return True
 
@@ -40,14 +41,15 @@ def test_default_container_scope(pytester):
     result.assert_outcomes(passed=1)
 
 
-def test_general_container_scope(testdir, request):
-    params = ["--container-scope=session"]
+@pytest.mark.parametrize("scope", ["session", "module", "class"])
+def test_general_container_scope(testdir, request, scope):
+    params = [f"--container-scope={scope}"]
     assert request.config.pluginmanager.hasplugin("docker")
 
     testdir.makepyfile(
-        """
+        f"""
         import pytest
-        @pytest.fixture(scope="session")
+        @pytest.fixture(scope="{scope}")
         def dummy(docker_cleanup):
             return True
 
