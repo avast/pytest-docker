@@ -1,3 +1,4 @@
+import pytest
 from .plugin import (
     docker_cleanup,
     docker_compose_command,
@@ -19,7 +20,6 @@ __all__ = [
     "docker_services",
 ]
 
-import pytest
 
 def pytest_addoption(parser: pytest.Parser) -> None:
     group = parser.getgroup("docker")
@@ -29,5 +29,6 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store",
         default="session",
         help="The pytest fixture scope for reusing containers between tests."
-        " For available scopes and descriptions, see https://docs.pytest.org/en/6.2.x/fixture.html#fixture-scopes",
+        " For available scopes and descriptions, "
+        "   see https://docs.pytest.org/en/6.2.x/fixture.html#fixture-scopes",
     )

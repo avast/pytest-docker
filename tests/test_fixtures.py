@@ -1,6 +1,4 @@
-import pytest
 import os.path
-
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
