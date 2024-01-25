@@ -16,15 +16,18 @@ def test_docker_compose_project(docker_compose_project_name):
 def test_docker_cleanup(docker_cleanup):
     assert docker_cleanup == "down -v"
 
+
 def test_docker_setup(docker_setup):
     assert docker_setup == "up --build -d"
+
 
 def test_docker_compose_comand(docker_compose_command):
     assert docker_compose_command == "docker compose"
 
+
 def test_default_container_scope(pytester):
     pytester.makepyfile(
-    """
+        """
         import pytest
         @pytest.fixture(scope="module")
         def dummy(docker_cleanup):
@@ -35,16 +38,16 @@ def test_default_container_scope(pytester):
     """
     )
 
-    result =pytester.runpytest()
+    result = pytester.runpytest()
     result.assert_outcomes(passed=1)
+
 
 def test_general_container_scope(testdir, request):
     params = ["--container-scope=session"]
-    assert request.config.pluginmanager.hasplugin('docker')
-
+    assert request.config.pluginmanager.hasplugin("docker")
 
     testdir.makepyfile(
-    """
+        """
         import pytest
         @pytest.fixture(scope="session")
         def dummy(docker_cleanup):
