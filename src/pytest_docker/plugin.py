@@ -15,7 +15,7 @@ def container_scope_fixture(request):
     return request.config.getoption("--container-scope")
 
 def containers_scope(fixture_name, config):
-    return config.getoption("--container-scope", "module")
+    return config.getoption("--container-scope", "session")
 
 def execute(command, success_codes=(0,)):
     """Run a shell command."""
