@@ -162,8 +162,7 @@ def docker_compose_project_name():
 
 
 def get_cleanup_command():
-
-    return "down -v"
+    return ["down -v"]
 
 
 @pytest.fixture(scope=containers_scope)
@@ -176,8 +175,7 @@ def docker_cleanup():
 
 
 def get_setup_command():
-
-    return "up --build -d"
+    return ["up --build -d"]
 
 
 @pytest.fixture(scope=containers_scope)
@@ -203,7 +201,11 @@ def get_docker_services(
 
     # setup containers.
     if docker_setup:
-        docker_compose.execute(docker_setup)
+        # Maintain backwards compatibility with the string format.
+        if isinstance(docker_setup, str):
+            docker_setup = [docker_setup]
+        for command in docker_setup:
+            docker_compose.execute(command)
 
     try:
         # Let test(s) run.
@@ -211,7 +213,11 @@ def get_docker_services(
     finally:
         # Clean up.
         if docker_cleanup:
-            docker_compose.execute(docker_cleanup)
+            # Maintain backwards compatibility with the string format.
+            if isinstance(docker_cleanup, str):
+                docker_cleanup = [docker_cleanup]
+            for command in docker_cleanup:
+                docker_compose.execute(command)
 
 
 @pytest.fixture(scope=containers_scope)
