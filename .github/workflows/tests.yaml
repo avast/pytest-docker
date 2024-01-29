@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
-        pytest-version: [4, 5, 6, 7]
+        pytest-version: [4, 5, 6, 7, 8]
 
     steps:
       - uses: actions/checkout@v2
