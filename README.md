@@ -13,9 +13,6 @@ tests with Docker and [Docker Compose](https://docs.docker.com/compose/).
 Specify all necessary containers in a `docker-compose.yml` file and and
 `pytest-docker` will spin them up for the duration of your tests.
 
-This package is tested with Python versions `3.6`, `3.7`, `3.8` and
-`3.9`, and `pytest` version 4, 5 and 6. Python 2 is not supported.
-
 `pytest-docker` was originally created by André Caron.
 
 # Installation
