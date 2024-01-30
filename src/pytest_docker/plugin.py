@@ -12,6 +12,13 @@ import py
 import pytest
 
 
+@pytest.fixture
+def container_scope_fixture(request):
+    return request.config.getoption("--container-scope")
+
+def containers_scope(fixture_name, config):
+    return config.getoption("--container-scope", "session")
+
 def execute(command: str, success_codes: Iterable[int] = (0,)) -> Union[bytes, Any]:
     """Run a shell command."""
     try:
@@ -42,7 +49,7 @@ def get_docker_ip() -> Union[str, Any]:
     return match.group(1)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=containers_scope)
 def docker_ip() -> Union[str, Any]:
     """Determine the IP address for TCP connections to Docker containers."""
 
@@ -131,7 +138,7 @@ class DockerComposeExecutor:
         return execute(command)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=containers_scope)
 def docker_compose_command() -> str:
     """Docker Compose command to use, it could be either `docker compose`
     for Docker Compose V2 or `docker-compose` for Docker Compose
@@ -140,7 +147,7 @@ def docker_compose_command() -> str:
     return "docker compose"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=containers_scope)
 def docker_compose_file(pytestconfig: Any) -> str:
     """Get an absolute path to the  `docker-compose.yml` file. Override this
     fixture in your tests if you need a custom location."""
@@ -148,7 +155,7 @@ def docker_compose_file(pytestconfig: Any) -> str:
     return os.path.join(str(pytestconfig.rootdir), "tests", "docker-compose.yml")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=containers_scope)
 def docker_compose_project_name() -> str:
     """Generate a project name using the current process PID. Override this
     fixture in your tests if you need a particular project name."""
@@ -156,11 +163,11 @@ def docker_compose_project_name() -> str:
     return "pytest{}".format(os.getpid())
 
 
-def get_cleanup_command() -> str:
-    return "down -v"
+def get_cleanup_command() -> list[str]:
+    return ["down -v"]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=containers_scope)
 def docker_cleanup() -> str:
     """Get the docker_compose command to be executed for test clean-up actions.
     Override this fixture in your tests if you need to change clean-up actions.
@@ -169,11 +176,11 @@ def docker_cleanup() -> str:
     return get_cleanup_command()
 
 
-def get_setup_command() -> str:
-    return "up --build -d"
+def get_setup_command() -> list[str]:
+    return ["up --build -d"]
 
-
-@pytest.fixture(scope="session")
+  
+@pytest.fixture(scope=containers_scope)
 def docker_setup() -> str:
     """Get the docker_compose command to be executed for test setup actions.
     Override this fixture in your tests if you need to change setup actions.
@@ -196,7 +203,11 @@ def get_docker_services(
 
     # setup containers.
     if docker_setup:
-        docker_compose.execute(docker_setup)
+        # Maintain backwards compatibility with the string format.
+        if isinstance(docker_setup, str):
+            docker_setup = [docker_setup]
+        for command in docker_setup:
+            docker_compose.execute(command)
 
     try:
         # Let test(s) run.
@@ -204,10 +215,14 @@ def get_docker_services(
     finally:
         # Clean up.
         if docker_cleanup:
-            docker_compose.execute(docker_cleanup)
+            # Maintain backwards compatibility with the string format.
+            if isinstance(docker_cleanup, str):
+                docker_cleanup = [docker_cleanup]
+            for command in docker_cleanup:
+                docker_compose.execute(command)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=containers_scope)
 def docker_services(
     docker_compose_command: str,
     docker_compose_file: str,
