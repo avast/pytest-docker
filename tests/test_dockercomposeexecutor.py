@@ -38,13 +38,15 @@ def test_pypath_compose_files() -> None:
         docker_compose.execute("up")
         assert check_output.call_args_list == [
             mock.call(
-                'docker compose -f "/tmp/docker-compose.yml"' ' -p "pytest123" up',
+                'docker compose -f "/tmp/docker-compose.yml"'
+                ' -p "pytest123" up',  # pylint: disable:=implicit-str-concat
                 shell=True,
                 stderr=subprocess.STDOUT,
             )
         ] or check_output.call_args_list == [
             mock.call(
-                'docker compose -f "C:\\tmp\\docker-compose.yml"' ' -p "pytest123" up',
+                'docker compose -f "C:\\tmp\\docker-compose.yml"'
+                ' -p "pytest123" up',  # pylint: disable:=implicit-str-concat
                 shell=True,
                 stderr=subprocess.STDOUT,
             )
