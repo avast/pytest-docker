@@ -172,7 +172,7 @@ def test_wait_until_responsive_timeout() -> None:
     assert str(exc.value) == ("Timeout reached while waiting on service!")
 
 
-def test_single_commands():
+def test_single_commands() -> None:
     """Ensures backwards compatibility with single command strings for setup and cleanup."""
 
     with mock.patch("subprocess.check_output") as check_output:
@@ -226,7 +226,7 @@ def test_single_commands():
     ]
 
 
-def test_multiple_commands():
+def test_multiple_commands() -> None:
     """Multiple startup and cleanup commands should be executed."""
 
     with mock.patch("subprocess.check_output") as check_output:

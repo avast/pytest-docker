@@ -1,5 +1,9 @@
 import os.path
+from typing import List
+
 import pytest
+from _pytest.fixtures import FixtureRequest
+from _pytest.pytester import Pytester
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -11,12 +15,12 @@ def test_docker_compose_file(docker_compose_file: str) -> None:
 def test_docker_compose_project(docker_compose_project_name: str) -> None:
     assert docker_compose_project_name == "pytest{}".format(os.getpid())
 
-    
-def test_docker_cleanup(docker_cleanup: list[str]) -> None:
+
+def test_docker_cleanup(docker_cleanup: List[str]) -> None:
     assert docker_cleanup == ["down -v"]
 
 
-def test_docker_setup(docker_setup: list[str]) -> None:
+def test_docker_setup(docker_setup: List[str]) -> None:
     assert docker_setup == ["up --build -d"]
 
 
@@ -24,7 +28,7 @@ def test_docker_compose_comand(docker_compose_command: str) -> None:
     assert docker_compose_command == "docker compose"
 
 
-def test_default_container_scope(pytester):
+def test_default_container_scope(pytester: Pytester) -> None:
     pytester.makepyfile(
         """
         import pytest
@@ -42,7 +46,7 @@ def test_default_container_scope(pytester):
 
 
 @pytest.mark.parametrize("scope", ["session", "module", "class"])
-def test_general_container_scope(testdir, request, scope):
+def test_general_container_scope(testdir: Pytester, request: FixtureRequest, scope: str) -> None:
     params = [f"--container-scope={scope}"]
     assert request.config.pluginmanager.hasplugin("docker")
 

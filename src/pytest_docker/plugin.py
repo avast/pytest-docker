@@ -4,20 +4,22 @@ import re
 import subprocess
 import time
 import timeit
-from collections.abc import Callable
 from typing import Any, Dict, Iterable, Iterator, List, Tuple, Union
 
 import attr
-import py
 import pytest
+from _pytest.config import Config
+from _pytest.fixtures import FixtureRequest
 
 
 @pytest.fixture
-def container_scope_fixture(request):
+def container_scope_fixture(request: FixtureRequest) -> Any:
     return request.config.getoption("--container-scope")
 
-def containers_scope(fixture_name, config):
+
+def containers_scope(fixture_name: str, config: Config) -> Any:
     return config.getoption("--container-scope", "session")
+
 
 def execute(command: str, success_codes: Iterable[int] = (0,)) -> Union[bytes, Any]:
     """Run a shell command."""
@@ -127,7 +129,7 @@ def str_to_list(arg: Union[str, List[Any], Tuple[Any]]) -> Union[List[Any], Tupl
 @attr.s(frozen=True)
 class DockerComposeExecutor:
     _compose_command: str = attr.ib()
-    _compose_files: Any= attr.ib(converter=str_to_list)
+    _compose_files: Any = attr.ib(converter=str_to_list)
     _compose_project_name: str = attr.ib()
 
     def execute(self, subcommand: str) -> Union[bytes, Any]:
@@ -163,12 +165,12 @@ def docker_compose_project_name() -> str:
     return "pytest{}".format(os.getpid())
 
 
-def get_cleanup_command() -> list[str]:
+def get_cleanup_command() -> Union[List[str], str]:
     return ["down -v"]
 
 
 @pytest.fixture(scope=containers_scope)
-def docker_cleanup() -> str:
+def docker_cleanup() -> Union[List[str], str]:
     """Get the docker_compose command to be executed for test clean-up actions.
     Override this fixture in your tests if you need to change clean-up actions.
     Returning anything that would evaluate to False will skip this command."""
@@ -176,12 +178,12 @@ def docker_cleanup() -> str:
     return get_cleanup_command()
 
 
-def get_setup_command() -> list[str]:
+def get_setup_command() -> Union[List[str], str]:
     return ["up --build -d"]
 
-  
+
 @pytest.fixture(scope=containers_scope)
-def docker_setup() -> str:
+def docker_setup() -> Union[List[str], str]:
     """Get the docker_compose command to be executed for test setup actions.
     Override this fixture in your tests if you need to change setup actions.
     Returning anything that would evaluate to False will skip this command."""
@@ -194,8 +196,8 @@ def get_docker_services(
     docker_compose_command: str,
     docker_compose_file: str,
     docker_compose_project_name: str,
-    docker_setup: str,
-    docker_cleanup: str,
+    docker_setup: Union[List[str], str],
+    docker_cleanup: Union[List[str], str],
 ) -> Iterator[Services]:
     docker_compose = DockerComposeExecutor(
         docker_compose_command, docker_compose_file, docker_compose_project_name

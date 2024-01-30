@@ -3,10 +3,10 @@ import subprocess
 from os import path
 
 import requests
+from pytest import TempdirFactory, Testdir
+from pytest_docker.plugin import Services
 from requests.exceptions import ConnectionError
 
-from pytest_docker.plugin import Services
-from pytest import Testdir, TempdirFactory
 
 def is_responsive(url: str) -> bool:
     """Check if something responds to ``url``."""
@@ -88,9 +88,9 @@ def _copy_compose_files_to_testdir(testdir: Testdir, compose_file_path: str) -> 
 
 def _check_volume_is_gone(project_name: str) -> None:
     check_proc = subprocess.Popen("docker volume ls".split(), stdout=subprocess.PIPE)
-    assert project_name.encode() not in check_proc.stdout.read() # type: ignore
+    assert project_name.encode() not in check_proc.stdout.read()  # type: ignore
 
 
 def _check_container_is_gone(project_name: str) -> None:
     check_proc = subprocess.Popen("docker ps".split(), stdout=subprocess.PIPE)
-    assert project_name.encode() not in check_proc.stdout.read() # type: ignore
+    assert project_name.encode() not in check_proc.stdout.read()  # type: ignore
