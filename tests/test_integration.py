@@ -2,7 +2,6 @@ import shutil
 import subprocess
 from os import path
 from pathlib import Path
-from typing import Optional
 
 import requests
 from pytest import Testdir
@@ -10,13 +9,13 @@ from pytest_docker.plugin import Services
 from requests.exceptions import ConnectionError
 
 
-def is_responsive(url: str) -> Optional[bool]:
+def is_responsive(url: str) -> bool:
     """Check if something responds to ``url``."""
     try:
         response = requests.get(url)
         if response.status_code == 204:
             return True
-        return
+        return False
     except ConnectionError:
         return False
 

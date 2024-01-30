@@ -1,10 +1,8 @@
 from os import path
-from typing import Any, Callable, Iterable
 from wsgiref.simple_server import make_server
-from wsgiref.types import StartResponse  # type: ignore
 
 
-def test_app(_: Any, start_response: Callable[..., StartResponse]) -> Iterable[bytes]:
+def test_app(_, start_response):  # type: ignore
     # This path is set up as a volume in the test's docker-compose.yml,
     # so we make sure that we really work with Docker Compose.
     if path.exists("/test_volume"):

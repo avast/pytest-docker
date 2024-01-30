@@ -17,7 +17,7 @@ def container_scope_fixture(request: FixtureRequest) -> Any:
     return request.config.getoption("--container-scope")
 
 
-def containers_scope(fixture_name: str, config: Config) -> Any:
+def containers_scope(fixture_name: str, config: Config) -> Any:  # pylint: disable=unused-argument
     return config.getoption("--container-scope", "session")
 
 

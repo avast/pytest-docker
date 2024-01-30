@@ -146,7 +146,8 @@ def test_docker_services_failure() -> None:
     # Tear down code should not be called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" ' "up --build -d", # pylint: disable:=implicit-str-concat
+            'docker compose -f "docker-compose.yml" -p "pytest123" '
+            "up --build -d",  # pylint: disable:=implicit-str-concat
             shell=True,
             stderr=subprocess.STDOUT,
         )
