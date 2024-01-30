@@ -179,7 +179,8 @@ to make sure that the correct configuration is used. This is also how tests are
 run in CI.
 
 Use [black](https://pypi.org/project/black/) with default settings for
-formatting.
+formatting. You can also use `pylint` with `setup.cfg` as the configuration
+file as well as `mypy` for type checking.
 
 # Contributing
 
