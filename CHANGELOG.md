@@ -1,11 +1,5 @@
 # Changelog
 
-## Version 2.1.0
-
-Feat:
-
-- Add typehints for mypy support
-
 ## Version 2.0.0
 
 Breaking changes:
@@ -107,7 +101,7 @@ Changes:
 
 ## Version 0.6.0
 
-- Added ability to return List of files from `docker_compose_file` fixture
+- Added ability to return list of files from `docker_compose_file` fixture
 
 ## Version 0.3.0
 
