@@ -150,7 +150,7 @@ def docker_compose_command() -> str:
 
 
 @pytest.fixture(scope=containers_scope)
-def docker_compose_file(pytestconfig: Any) -> str:
+def docker_compose_file(pytestconfig: Any) -> Union[List[str], str]:
     """Get an absolute path to the  `docker-compose.yml` file. Override this
     fixture in your tests if you need a custom location."""
 
@@ -194,7 +194,7 @@ def docker_setup() -> Union[List[str], str]:
 @contextlib.contextmanager
 def get_docker_services(
     docker_compose_command: str,
-    docker_compose_file: str,
+    docker_compose_file: Union[List[str], str],
     docker_compose_project_name: str,
     docker_setup: Union[List[str], str],
     docker_cleanup: Union[List[str], str],
@@ -227,7 +227,7 @@ def get_docker_services(
 @pytest.fixture(scope=containers_scope)
 def docker_services(
     docker_compose_command: str,
-    docker_compose_file: str,
+    docker_compose_file: Union[List[str], str],
     docker_compose_project_name: str,
     docker_setup: str,
     docker_cleanup: str,
