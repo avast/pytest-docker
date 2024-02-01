@@ -180,7 +180,7 @@ run in CI.
 
 Use [black](https://pypi.org/project/black/) with default settings for
 formatting. You can also use `pylint` with `setup.cfg` as the configuration
-file.
+file as well as `mypy` for type checking.
 
 # Contributing
 

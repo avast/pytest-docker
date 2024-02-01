@@ -2,7 +2,7 @@ from os import path
 from wsgiref.simple_server import make_server
 
 
-def test_app(_, start_response):
+def test_app(_, start_response):  # type: ignore
     # This path is set up as a volume in the test's docker-compose.yml,
     # so we make sure that we really work with Docker Compose.
     if path.exists("/test_volume"):

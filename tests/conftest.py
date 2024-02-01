@@ -1,1 +1,1 @@
-pytest_plugins = ["pytester"]  # pylint: disable=invalid-name
+pytest_plugins = ["pytester"]

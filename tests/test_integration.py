@@ -1,22 +1,26 @@
 import shutil
 import subprocess
 from os import path
+from pathlib import Path
 
 import requests
+from pytest import Testdir
+from pytest_docker.plugin import Services
 from requests.exceptions import ConnectionError
 
 
-def is_responsive(url):
+def is_responsive(url: str) -> bool:
     """Check if something responds to ``url``."""
     try:
         response = requests.get(url)
         if response.status_code == 204:
             return True
+        return False
     except ConnectionError:
         return False
 
 
-def test_main_fixtures_work(docker_ip, docker_services):
+def test_main_fixtures_work(docker_ip: str, docker_services: Services) -> None:
     """Showcase the power of our Docker fixtures!"""
 
     # Build URL to service listening on random port.
@@ -32,12 +36,14 @@ def test_main_fixtures_work(docker_ip, docker_services):
     assert response.status_code == 204
 
 
-def test_containers_and_volumes_get_cleaned_up(testdir, tmpdir, docker_compose_file):
+def test_containers_and_volumes_get_cleaned_up(
+    testdir: Testdir, tmpdir: Path, docker_compose_file: Path
+) -> None:
     _copy_compose_files_to_testdir(testdir, docker_compose_file)
 
-    project_name_file_path = path.join(str(tmpdir), "project_name.txt")
+    project_name_file_path = str(path.join(str(tmpdir), "project_name.txt")).replace("\\", "/")
     testdir.makepyfile(
-        """
+        f"""
     import subprocess
 
     def _check_volume_exists(project_name):
@@ -57,11 +63,9 @@ def test_containers_and_volumes_get_cleaned_up(testdir, tmpdir, docker_compose_f
     def test_whatever(docker_services, docker_compose_project_name):
         _check_volume_exists(docker_compose_project_name)
         _check_container_exists(docker_compose_project_name)
-        with open('{}', 'w') as project_name_file:
+        with open(f"{project_name_file_path}", 'w') as project_name_file:
             project_name_file.write(docker_compose_project_name)
-    """.format(
-            str(project_name_file_path)
-        )
+    """
     )
 
     result = testdir.runpytest()
@@ -73,23 +77,21 @@ def test_containers_and_volumes_get_cleaned_up(testdir, tmpdir, docker_compose_f
     _check_container_is_gone(compose_project_name)
 
 
-def _copy_compose_files_to_testdir(testdir, compose_file_path):
+def _copy_compose_files_to_testdir(testdir: Testdir, compose_file_path: Path) -> None:
     directory_for_compose_files = testdir.mkdir("tests")
     shutil.copy(compose_file_path, str(directory_for_compose_files))
 
-    container_build_files_dir = path.realpath(
-        path.join(compose_file_path, "../containers")
-    )
-    shutil.copytree(
-        container_build_files_dir, str(directory_for_compose_files) + "/containers"
-    )
+    container_build_files_dir = path.realpath(path.join(compose_file_path, "../containers"))
+    shutil.copytree(container_build_files_dir, str(directory_for_compose_files) + "/containers")
 
 
-def _check_volume_is_gone(project_name):
+def _check_volume_is_gone(project_name: str) -> None:
     check_proc = subprocess.Popen("docker volume ls".split(), stdout=subprocess.PIPE)
+    assert check_proc.stdout is not None
     assert project_name.encode() not in check_proc.stdout.read()
 
 
-def _check_container_is_gone(project_name):
+def _check_container_is_gone(project_name: str) -> None:
     check_proc = subprocess.Popen("docker ps".split(), stdout=subprocess.PIPE)
+    assert check_proc.stdout is not None
     assert project_name.encode() not in check_proc.stdout.read()

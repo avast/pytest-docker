@@ -5,13 +5,13 @@ import pytest
 from pytest_docker.plugin import (
     DockerComposeExecutor,
     Services,
-    get_docker_services,
     get_cleanup_command,
+    get_docker_services,
     get_setup_command,
 )
 
 
-def test_docker_services():
+def test_docker_services() -> None:
     """Automatic teardown of all services."""
 
     with mock.patch("subprocess.check_output") as check_output:
@@ -66,7 +66,7 @@ def test_docker_services():
     ]
 
 
-def test_docker_services_unused_port():
+def test_docker_services_unused_port() -> None:
     """Complain loudly when the requested port is not used by the service."""
 
     with mock.patch("subprocess.check_output") as check_output:
@@ -90,9 +90,7 @@ def test_docker_services_unused_port():
             # Can request port for services.
             with pytest.raises(ValueError) as exc:
                 print(services.port_for("abc", 123))
-            assert str(exc.value) == (
-                'Could not detect port for "%s:%d".' % ("abc", 123)
-            )
+            assert str(exc.value) == ('Could not detect port for "%s:%d".' % ("abc", 123))
 
             assert check_output.call_count == 2
 
@@ -101,30 +99,30 @@ def test_docker_services_unused_port():
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" ' "up --build -d",
+            'docker compose -f "docker-compose.yml" -p "pytest123" '
+            "up --build -d",  # pylint: disable:=implicit-str-concat
             shell=True,
             stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" ' "port abc 123",
+            'docker compose -f "docker-compose.yml" -p "pytest123" '
+            "port abc 123",  # pylint: disable:=implicit-str-concat
             shell=True,
             stderr=subprocess.STDOUT,
         ),
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
+            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',  # pylint: disable:=implicit-str-concat
             shell=True,
             stderr=subprocess.STDOUT,
         ),
     ]
 
 
-def test_docker_services_failure():
+def test_docker_services_failure() -> None:
     """Propagate failure to start service."""
 
     with mock.patch("subprocess.check_output") as check_output:
-        check_output.side_effect = [
-            subprocess.CalledProcessError(1, "the command", b"the output")
-        ]
+        check_output.side_effect = [subprocess.CalledProcessError(1, "the command", b"the output")]
         check_output.returncode = 1
 
         # The fixture is a context-manager.
@@ -148,14 +146,15 @@ def test_docker_services_failure():
     # Tear down code should not be called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" ' "up --build -d",
+            'docker compose -f "docker-compose.yml" -p "pytest123" '
+            "up --build -d",  # pylint: disable:=implicit-str-concat
             shell=True,
             stderr=subprocess.STDOUT,
         )
     ]
 
 
-def test_wait_until_responsive_timeout():
+def test_wait_until_responsive_timeout() -> None:
     clock = mock.MagicMock()
     clock.side_effect = [0.0, 1.0, 2.0, 3.0]
 
@@ -168,7 +167,7 @@ def test_wait_until_responsive_timeout():
         services = Services(docker_compose)
         with pytest.raises(Exception) as exc:
             print(
-                services.wait_until_responsive(
+                services.wait_until_responsive(  # type: ignore
                     check=lambda: False, timeout=3.0, pause=1.0, clock=clock
                 )
             )
@@ -176,7 +175,7 @@ def test_wait_until_responsive_timeout():
     assert str(exc.value) == ("Timeout reached while waiting on service!")
 
 
-def test_single_commands():
+def test_single_commands() -> None:
     """Ensures backwards compatibility with single command strings for setup and cleanup."""
 
     with mock.patch("subprocess.check_output") as check_output:
@@ -230,7 +229,7 @@ def test_single_commands():
     ]
 
 
-def test_multiple_commands():
+def test_multiple_commands() -> None:
     """Multiple startup and cleanup commands should be executed."""
 
     with mock.patch("subprocess.check_output") as check_output:
