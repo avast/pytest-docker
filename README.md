@@ -157,6 +157,18 @@ Get the list of docker_compose commands to be executed for test clean-up actions
 Override this fixture in your tests if you need to change clean-up actions.
 Returning anything that would evaluate to False will skip this command.
 
+## Docker Live Output
+
+```python
+@pytest.fixture(scope="session")
+def http_service(docker_ip, docker_services):
+    docker_services.display_live_logs("service_name")
+```
+
+```bash
+pytest --capture=tee-sys <test directory>
+```
+
 # Development
 
 Use of a virtual environment is recommended. See the

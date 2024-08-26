@@ -15,51 +15,56 @@ def test_docker_services() -> None:
     """Automatic teardown of all services."""
 
     with mock.patch("subprocess.check_output") as check_output:
-        check_output.side_effect = [b"", b"0.0.0.0:32770", b""]
-        check_output.returncode = 0
+        with mock.patch("subprocess.run") as run:
+            check_output.side_effect = [b"0.0.0.0:32770"]
+            check_output.returncode = 0
+            run.return_value = subprocess.CompletedProcess([], returncode=0)
 
-        assert check_output.call_count == 0
+            assert check_output.call_count == 0
 
-        # The fixture is a context-manager.
-        with get_docker_services(
-            "docker compose",
-            "docker-compose.yml",
-            docker_compose_project_name="pytest123",
-            docker_setup=get_setup_command(),
-            docker_cleanup=get_cleanup_command(),
-        ) as services:
-            assert isinstance(services, Services)
+            # The fixture is a context-manager.
+            with get_docker_services(
+                "docker compose",
+                "docker-compose.yml",
+                docker_compose_project_name="pytest123",
+                docker_setup=get_setup_command(),
+                docker_cleanup=get_cleanup_command(),
+            ) as services:
+                assert isinstance(services, Services)
 
-            assert check_output.call_count == 1
+                assert run.call_count == 1
+                assert check_output.call_count == 0
 
-            # Can request port for services.
-            port = services.port_for("abc", 123)
-            assert port == 32770
+                # Can request port for services.
+                port = services.port_for("abc", 123)
+                assert port == 32770
 
-            assert check_output.call_count == 2
+                assert check_output.call_count == 1
 
-            # 2nd request for same service should hit the cache.
-            port = services.port_for("abc", 123)
-            assert port == 32770
+                # 2nd request for same service should hit the cache.
+                port = services.port_for("abc", 123)
+                assert port == 32770
 
-            assert check_output.call_count == 2
+                assert check_output.call_count == 1
 
-        assert check_output.call_count == 3
+            assert run.call_count == 2
 
     # Both should have been called.
-    assert check_output.call_args_list == [
+    assert run.call_args_list == [
         mock.call(
             'docker compose -f "docker-compose.yml" -p "pytest123" up --build -d',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" port abc 123',
+            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
+    ]
+    assert check_output.call_args_list == [
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
+            'docker compose -f "docker-compose.yml" -p "pytest123" port abc 123',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
@@ -70,43 +75,41 @@ def test_docker_services_unused_port() -> None:
     """Complain loudly when the requested port is not used by the service."""
 
     with mock.patch("subprocess.check_output") as check_output:
-        check_output.side_effect = [b"", b"", b""]
-        check_output.returncode = 0
+        with mock.patch("subprocess.run") as run:
+            check_output.side_effect = [b"", b"", b""]
+            check_output.returncode = 0
+            run.return_value = subprocess.CompletedProcess([], returncode=0)
 
-        assert check_output.call_count == 0
+            assert check_output.call_count == 0
 
-        # The fixture is a context-manager.
-        with get_docker_services(
-            "docker compose",
-            "docker-compose.yml",
-            docker_compose_project_name="pytest123",
-            docker_setup=get_setup_command(),
-            docker_cleanup=get_cleanup_command(),
-        ) as services:
-            assert isinstance(services, Services)
+            # The fixture is a context-manager.
+            with get_docker_services(
+                "docker compose",
+                "docker-compose.yml",
+                docker_compose_project_name="pytest123",
+                docker_setup=get_setup_command(),
+                docker_cleanup=get_cleanup_command(),
+            ) as services:
+                assert isinstance(services, Services)
 
+                assert run.call_count == 1
+                assert check_output.call_count == 0
+
+                # Can request port for services.
+                with pytest.raises(ValueError) as exc:
+                    print(services.port_for("abc", 123))
+                assert str(exc.value) == ('Could not detect port for "%s:%d".' % ("abc", 123))
+
+                assert check_output.call_count == 1
+
+            assert run.call_count == 2
             assert check_output.call_count == 1
 
-            # Can request port for services.
-            with pytest.raises(ValueError) as exc:
-                print(services.port_for("abc", 123))
-            assert str(exc.value) == ('Could not detect port for "%s:%d".' % ("abc", 123))
-
-            assert check_output.call_count == 2
-
-        assert check_output.call_count == 3
-
     # Both should have been called.
-    assert check_output.call_args_list == [
+    assert run.call_args_list == [
         mock.call(
             'docker compose -f "docker-compose.yml" -p "pytest123" '
             "up --build -d",  # pylint: disable:=implicit-str-concat
-            shell=True,
-            stderr=subprocess.STDOUT,
-        ),
-        mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" '
-            "port abc 123",  # pylint: disable:=implicit-str-concat
             shell=True,
             stderr=subprocess.STDOUT,
         ),
@@ -116,14 +119,22 @@ def test_docker_services_unused_port() -> None:
             stderr=subprocess.STDOUT,
         ),
     ]
+    assert check_output.call_args_list == [
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" '
+            "port abc 123",  # pylint: disable:=implicit-str-concat
+            shell=True,
+            stderr=subprocess.STDOUT,
+        ),
+    ]
 
 
 def test_docker_services_failure() -> None:
     """Propagate failure to start service."""
 
-    with mock.patch("subprocess.check_output") as check_output:
-        check_output.side_effect = [subprocess.CalledProcessError(1, "the command", b"the output")]
-        check_output.returncode = 1
+    with mock.patch("subprocess.run") as run:
+        run.side_effect = [subprocess.CalledProcessError(1, "the command")]
+        run.returncode = 1
 
         # The fixture is a context-manager.
         with pytest.raises(Exception) as exc:
@@ -138,13 +149,13 @@ def test_docker_services_failure() -> None:
 
         # Failure propagates with improved diagnoatics.
         assert str(exc.value) == (
-            'Command {} returned {}: """{}""".'.format("the command", 1, "the output")
+            'Command {} returned {}'.format("the command", 1)
         )
 
-        assert check_output.call_count == 1
+        assert run.call_count == 1
 
     # Tear down code should not be called.
-    assert check_output.call_args_list == [
+    assert run.call_args_list == [
         mock.call(
             'docker compose -f "docker-compose.yml" -p "pytest123" '
             "up --build -d",  # pylint: disable:=implicit-str-concat
@@ -179,50 +190,56 @@ def test_single_commands() -> None:
     """Ensures backwards compatibility with single command strings for setup and cleanup."""
 
     with mock.patch("subprocess.check_output") as check_output:
-        check_output.returncode = 0
+        with mock.patch("subprocess.run") as run:
+            run.return_value = subprocess.CompletedProcess([], returncode=0)
+            check_output.returncode = 0
 
-        assert check_output.call_count == 0
+            assert check_output.call_count == 0
 
-        # The fixture is a context-manager.
-        with get_docker_services(
-            "docker compose",
-            "docker-compose.yml",
-            docker_compose_project_name="pytest123",
-            docker_setup="up --build -d",
-            docker_cleanup="down -v",
-        ) as services:
-            assert isinstance(services, Services)
+            # The fixture is a context-manager.
+            with get_docker_services(
+                "docker compose",
+                "docker-compose.yml",
+                docker_compose_project_name="pytest123",
+                docker_setup="up --build -d",
+                docker_cleanup="down -v",
+            ) as services:
+                assert isinstance(services, Services)
 
-            assert check_output.call_count == 1
+                assert run.call_count == 1
+                assert check_output.call_count == 0
 
-            # Can request port for services.
-            port = services.port_for("hello", 80)
-            assert port == 1
+                # Can request port for services.
+                port = services.port_for("hello", 80)
+                assert port == 1
 
-            assert check_output.call_count == 2
+                assert check_output.call_count == 1
 
-            # 2nd request for same service should hit the cache.
-            port = services.port_for("hello", 80)
-            assert port == 1
+                # 2nd request for same service should hit the cache.
+                port = services.port_for("hello", 80)
+                assert port == 1
 
-            assert check_output.call_count == 2
+                assert check_output.call_count == 1
 
-        assert check_output.call_count == 3
+        assert run.call_count == 2
+        assert check_output.call_count == 1
 
     # Both should have been called.
-    assert check_output.call_args_list == [
+    assert run.call_args_list == [
         mock.call(
             'docker compose -f "docker-compose.yml" -p "pytest123" up --build -d',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" port hello 80',
+            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
+    ]
+    assert check_output.call_args_list == [
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
+            'docker compose -f "docker-compose.yml" -p "pytest123" port hello 80',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
@@ -233,38 +250,42 @@ def test_multiple_commands() -> None:
     """Multiple startup and cleanup commands should be executed."""
 
     with mock.patch("subprocess.check_output") as check_output:
-        check_output.returncode = 0
+        with mock.patch("subprocess.run") as run:
+            run.return_value = subprocess.CompletedProcess([], returncode=0)
+            check_output.returncode = 0
 
-        assert check_output.call_count == 0
+            assert check_output.call_count == 0
 
-        # The fixture is a context-manager.
-        with get_docker_services(
-            "docker compose",
-            "docker-compose.yml",
-            docker_compose_project_name="pytest123",
-            docker_setup=["ps", "up --build -d"],
-            docker_cleanup=["down -v", "ps"],
-        ) as services:
-            assert isinstance(services, Services)
+            # The fixture is a context-manager.
+            with get_docker_services(
+                "docker compose",
+                "docker-compose.yml",
+                docker_compose_project_name="pytest123",
+                docker_setup=["ps", "up --build -d"],
+                docker_cleanup=["down -v", "ps"],
+            ) as services:
+                assert isinstance(services, Services)
 
-            assert check_output.call_count == 2
+                assert run.call_count == 2
+                assert check_output.call_count == 0
 
-            # Can request port for services.
-            port = services.port_for("hello", 80)
-            assert port == 1
+                # Can request port for services.
+                port = services.port_for("hello", 80)
+                assert port == 1
 
-            assert check_output.call_count == 3
+                assert check_output.call_count == 1
 
-            # 2nd request for same service should hit the cache.
-            port = services.port_for("hello", 80)
-            assert port == 1
+                # 2nd request for same service should hit the cache.
+                port = services.port_for("hello", 80)
+                assert port == 1
 
-            assert check_output.call_count == 3
+                assert check_output.call_count == 1
 
-        assert check_output.call_count == 5
+        assert run.call_count == 4
+        assert check_output.call_count == 1
 
     # Both should have been called.
-    assert check_output.call_args_list == [
+    assert run.call_args_list == [
         mock.call(
             'docker compose -f "docker-compose.yml" -p "pytest123" ps',
             stderr=subprocess.STDOUT,
@@ -276,17 +297,19 @@ def test_multiple_commands() -> None:
             shell=True,
         ),
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" port hello 80',
-            stderr=subprocess.STDOUT,
-            shell=True,
-        ),
-        mock.call(
             'docker compose -f "docker-compose.yml" -p "pytest123" down -v',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
         mock.call(
             'docker compose -f "docker-compose.yml" -p "pytest123" ps',
+            stderr=subprocess.STDOUT,
+            shell=True,
+        ),
+    ]
+    assert check_output.call_args_list == [
+        mock.call(
+            'docker compose -f "docker-compose.yml" -p "pytest123" port hello 80',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
