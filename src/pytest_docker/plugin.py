@@ -152,7 +152,7 @@ class Services(contextlib.AbstractContextManager):  # type: ignore
     def close(self) -> None:
         for _, fut in self._live_logs.items():
             _ = fut.cancel()
-        self._thread_pool_executor.shutdown(wait=True, cancel_futures=True)
+        self._thread_pool_executor.shutdown(wait=False, cancel_futures=True)
 
     def __exit__(
         self,
