@@ -13,6 +13,8 @@ import pytest
 from _pytest.config import Config
 from _pytest.fixtures import FixtureRequest
 
+_MAX_LOG_WORKERS = 100
+
 
 @pytest.fixture
 def container_scope_fixture(request: FixtureRequest) -> Any:
@@ -83,7 +85,9 @@ class Services(contextlib.AbstractContextManager):  # type: ignore
     _live_logs: Dict[str, Future[Any]] = attr.ib(init=False, default=attr.Factory(dict))
     _thread_pool_executor: ThreadPoolExecutor = attr.ib(
         init=False,
-        default=attr.Factory(lambda: ThreadPoolExecutor(thread_name_prefix="docker_")),
+        default=attr.Factory(
+            lambda: ThreadPoolExecutor(max_workers=_MAX_LOG_WORKERS, thread_name_prefix="docker_")
+        ),
     )
 
     def port_for(self, service: str, container_port: int) -> int:
@@ -143,8 +147,17 @@ class Services(contextlib.AbstractContextManager):  # type: ignore
         raise Exception("Timeout reached while waiting on service!")
 
     def display_live_logs(self, service: str) -> None:
+        """Run `logs` command with the follow flag to show live logs of a service."""
         if service in self._live_logs:
             return
+
+        if len(self._live_logs) == _MAX_LOG_WORKERS:
+            raise NotImplementedError(
+                f"""\
+{_MAX_LOG_WORKERS} worker threads are supported to display live logs. \
+Please submit a PR if you want to change that."""
+            )
+
         self._live_logs[service] = self._thread_pool_executor.submit(
             self._docker_compose.execute, f"logs {service} -f"
         )
