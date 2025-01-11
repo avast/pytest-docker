@@ -108,6 +108,22 @@ def docker_compose_file(pytestconfig):
     return os.path.join(str(pytestconfig.rootdir), "mycustomdir", "docker-compose.yml")
 ```
 
+To use [multiple compose files](https://docs.docker.com/compose/how-tos/multiple-compose-files/merge/),
+return a list of paths from the `docker_compose_file` fixture:
+
+```python
+import os
+import pytest
+
+
+@pytest.fixture(scope="session")
+def docker_compose_file(pytestconfig):
+    return [
+        os.path.join(str(pytestconfig.rootdir), "tests", "compose.yml"),
+        os.path.join(str(pytestconfig.rootdir), "tests", "compose.override.yml"),
+    ]
+```
+
 ## Available fixtures
 
 By default the scope of the fixtures are `session` but can be changed with
