@@ -23,11 +23,11 @@ jobs:
           pip install ".[tests]"
       - name: Build image
         run: |
-          docker-compose -f tests/docker-compose.yml pull
-          docker-compose -f tests/docker-compose.yml build
+          docker compose -f tests/docker-compose.yml pull
+          docker compose -f tests/docker-compose.yml build
       - name: Run tests
         run: |
           pytest -c setup.cfg
       - name: Stop Docker compose
         run: |
-          docker-compose -f tests/docker-compose.yml down
+          docker compose -f tests/docker-compose.yml down
