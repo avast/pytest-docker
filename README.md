@@ -10,7 +10,7 @@ Docker-based integration tests
 
 Simple [pytest](http://doc.pytest.org/) fixtures that help you write integration
 tests with Docker and [Docker Compose](https://docs.docker.com/compose/).
-Specify all necessary containers in a `docker-compose.yml` file and and
+Specify all necessary containers in a `docker-compose.yml` file and
 `pytest-docker` will spin them up for the duration of your tests.
 
 `pytest-docker` was originally created by André Caron.
@@ -42,7 +42,7 @@ Another option could be usage of [`compose-switch`](https://github.com/docker/co
 
 # Usage
 
-Here is an example of a test that depends on a HTTP service.
+Here is an example of a test that depends on an HTTP service.
 
 With a `docker-compose.yml` file like this (using the
 [httpbin](https://httpbin.org/) service):
@@ -94,7 +94,7 @@ def test_status_code(http_service):
     assert response.status_code == status
 ```
 
-By default this plugin will try to open `docker-compose.yml` in your
+By default, this plugin will try to open `docker-compose.yml` in your
 `tests` directory. If you need to use a custom location, override the
 `docker_compose_file` fixture inside your `conftest.py` file:
 
@@ -124,9 +124,27 @@ def docker_compose_file(pytestconfig):
     ]
 ```
 
+If you want to debug the test suite in your IDE (Pycharm, VsCode, etc.) and need to stop the test, the stack will be left running.
+To avoid creating multiple stacks, you can pin the project name and always teardown before starting a new stack:
+
+```python
+import pytest
+
+# Pin the project name to avoid creating multiple stacks
+@pytest.fixture(scope="session")
+def docker_compose_project_name() -> str:
+    return "my-compose-project"
+
+# Stop the stack before starting a new one
+@pytest.fixture(scope="session")
+def docker_setup_command():
+    return ["down -v", "up --build -d"]
+```
+
+
 ## Available fixtures
 
-By default the scope of the fixtures are `session` but can be changed with
+By default, the scope of the fixtures are `session` but can be changed with
 `pytest` command line option `--container-scope <scope>`:
 
 ```bash
