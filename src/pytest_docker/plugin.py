@@ -21,10 +21,11 @@ def containers_scope(fixture_name: str, config: Config) -> Any:  # pylint: disab
     return config.getoption("--container-scope", "session")
 
 
-def execute(command: str, success_codes: Iterable[int] = (0,)) -> Union[bytes, Any]:
+def execute(command: str, success_codes: Iterable[int] = (0,), ignore_stderr: bool = False) -> Union[bytes, Any]:
     """Run a shell command."""
     try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+        stderr_pipe = subprocess.DEVNULL if ignore_stderr else subprocess.STDOUT
+        output = subprocess.check_output(command, stderr=stderr_pipe, shell=True)
         status = 0
     except subprocess.CalledProcessError as error:
         output = error.output or b""
@@ -132,12 +133,12 @@ class DockerComposeExecutor:
     _compose_files: Any = attr.ib(converter=str_to_list)
     _compose_project_name: str = attr.ib()
 
-    def execute(self, subcommand: str) -> Union[bytes, Any]:
+    def execute(self, subcommand: str, **kwargs: Any) -> Union[bytes, Any]:
         command = self._compose_command
         for compose_file in self._compose_files:
             command += ' -f "{}"'.format(compose_file)
         command += ' -p "{}" {}'.format(self._compose_project_name, subcommand)
-        return execute(command)
+        return execute(command, **kwargs)
 
 
 @pytest.fixture(scope=containers_scope)
