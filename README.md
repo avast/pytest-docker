@@ -137,7 +137,7 @@ def docker_compose_project_name() -> str:
 
 # Stop the stack before starting a new one
 @pytest.fixture(scope="session")
-def docker_setup_command():
+def docker_setup():
     return ["down -v", "up --build -d"]
 ```
 
