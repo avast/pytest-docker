@@ -46,10 +46,8 @@ def get_docker_ip() -> Union[str, Any]:
     if not docker_host or docker_host.startswith("unix://"):
         return "127.0.0.1"
 
-    match = re.match(r"^tcp://(.+?):\d+$", docker_host)
-    if not match:
-        raise ValueError('Invalid value for DOCKER_HOST: "%s".' % (docker_host,))
-    return match.group(1)
+    # Return just plain address without prefix and port
+    return re.sub(r"^[^:]+://(.+):\d+$", r"\1", docker_host)
 
 
 @pytest.fixture(scope=containers_scope)
