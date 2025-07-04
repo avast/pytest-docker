@@ -4,7 +4,7 @@ import re
 import subprocess
 import time
 import timeit
-from typing import Any, Dict, Iterable, Iterator, List, Tuple, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
 import attr
 import pytest
@@ -78,7 +78,7 @@ class Services:
         """
 
         # Lookup in the cache.
-        cache: int = self._services.get(service, {}).get(container_port, None)
+        cache: Optional[int] = self._services.get(service, {}).get(container_port, None)
         if cache is not None:
             return cache
 
