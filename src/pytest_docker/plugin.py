@@ -1,5 +1,6 @@
 import contextlib
 import os
+from pathlib import Path
 import re
 import subprocess
 import time
@@ -119,7 +120,7 @@ class Services:
         raise Exception("Timeout reached while waiting on service!")
 
 
-def str_to_list(arg: Union[str, List[Any], Tuple[Any]]) -> Union[List[Any], Tuple[Any]]:
+def str_to_list(arg: Union[str, Path, List[Any], Tuple[Any]]) -> Union[List[Any], Tuple[Any]]:
     if isinstance(arg, (list, tuple)):
         return arg
     return [arg]
