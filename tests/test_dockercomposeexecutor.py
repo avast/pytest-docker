@@ -1,7 +1,7 @@
 import subprocess
 from unittest import mock
 
-import py
+from pathlib import Path
 from pytest_docker.plugin import DockerComposeExecutor
 
 
@@ -31,9 +31,9 @@ def test_execute_docker_compose_v2() -> None:
         ]
 
 
-def test_pypath_compose_files() -> None:
-    compose_file: py.path.local = py.path.local("/tmp/docker-compose.yml")
-    docker_compose = DockerComposeExecutor("docker compose", compose_file, "pytest123")  # type: ignore
+def test_path_compose_file() -> None:
+    compose_file: Path = Path("/tmp/docker-compose.yml")
+    docker_compose = DockerComposeExecutor("docker compose", compose_file, "pytest123")
     with mock.patch("subprocess.check_output") as check_output:
         docker_compose.execute("up")
         assert check_output.call_args_list == [
