@@ -8,8 +8,12 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        pytest-version: [4, 5, 6, 7, 8]
-
+        pytest-version: [4, 5, 6, 7, 8, 9]
+        exclude:
+          - python-version: "3.8"
+            pytest-version: 9
+          - python-version: "3.9"
+            pytest-version: 9
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
