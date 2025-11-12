@@ -21,7 +21,7 @@ def test_docker_cleanup(docker_cleanup: List[str]) -> None:
 
 
 def test_docker_setup(docker_setup: List[str]) -> None:
-    assert docker_setup == ["up --build -d"]
+    assert docker_setup == ["up --build --wait"]
 
 
 def test_docker_compose_comand(docker_compose_command: str) -> None:

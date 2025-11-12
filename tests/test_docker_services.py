@@ -49,7 +49,7 @@ def test_docker_services() -> None:
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" up --build -d',
+            'docker compose -f "docker-compose.yml" -p "pytest123" up --build --wait',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
@@ -100,7 +100,7 @@ def test_docker_services_unused_port() -> None:
     assert check_output.call_args_list == [
         mock.call(
             'docker compose -f "docker-compose.yml" -p "pytest123" '
-            "up --build -d",  # pylint: disable:=implicit-str-concat
+            'up --build --wait',  # pylint: disable:=implicit-str-concat
             shell=True,
             stderr=subprocess.STDOUT,
         ),
@@ -147,7 +147,7 @@ def test_docker_services_failure() -> None:
     assert check_output.call_args_list == [
         mock.call(
             'docker compose -f "docker-compose.yml" -p "pytest123" '
-            "up --build -d",  # pylint: disable:=implicit-str-concat
+            "up --build --wait",  # pylint: disable:=implicit-str-concat
             shell=True,
             stderr=subprocess.STDOUT,
         )
@@ -188,7 +188,7 @@ def test_single_commands() -> None:
             "docker compose",
             "docker-compose.yml",
             docker_compose_project_name="pytest123",
-            docker_setup="up --build -d",
+            docker_setup="up --build --wait",
             docker_cleanup="down -v",
         ) as services:
             assert isinstance(services, Services)
@@ -212,7 +212,7 @@ def test_single_commands() -> None:
     # Both should have been called.
     assert check_output.call_args_list == [
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" up --build -d',
+            'docker compose -f "docker-compose.yml" -p "pytest123" up --build --wait',
             stderr=subprocess.STDOUT,
             shell=True,
         ),
@@ -242,7 +242,7 @@ def test_multiple_commands() -> None:
             "docker compose",
             "docker-compose.yml",
             docker_compose_project_name="pytest123",
-            docker_setup=["ps", "up --build -d"],
+            docker_setup=["ps", "up --build --wait"],
             docker_cleanup=["down -v", "ps"],
         ) as services:
             assert isinstance(services, Services)
@@ -271,7 +271,7 @@ def test_multiple_commands() -> None:
             shell=True,
         ),
         mock.call(
-            'docker compose -f "docker-compose.yml" -p "pytest123" up --build -d',
+            'docker compose -f "docker-compose.yml" -p "pytest123" up --build --wait',
             stderr=subprocess.STDOUT,
             shell=True,
         ),

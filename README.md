@@ -94,6 +94,10 @@ def test_status_code(http_service):
     assert response.status_code == status
 ```
 
+> The default `docker_setup` command includes `--wait`, which respects either the
+> image `HEALTHCHECK` or the compose `healthcheck`. Generally, if those
+> are configured properly, `wait_until_responsive` should not be required. 
+
 By default, this plugin will try to open `docker-compose.yml` in your
 `tests` directory. If you need to use a custom location, override the
 `docker_compose_file` fixture inside your `conftest.py` file:
@@ -138,7 +142,7 @@ def docker_compose_project_name() -> str:
 # Stop the stack before starting a new one
 @pytest.fixture(scope="session")
 def docker_setup():
-    return ["down -v", "up --build -d"]
+    return ["down -v", "up --build --wait"]
 ```
 
 
