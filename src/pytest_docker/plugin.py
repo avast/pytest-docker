@@ -149,12 +149,30 @@ def docker_compose_command() -> str:
     return "docker compose"
 
 
-@pytest.fixture(scope=containers_scope)
-def docker_compose_file(pytestconfig: Any) -> Union[List[str], str]:
-    """Get an absolute path to the  `docker-compose.yml` file. Override this
-    fixture in your tests if you need a custom location."""
+def _find_compose_file(basedir: Path) -> Optional[Path]:
+    # Search for well-known filenames, in the order defined by the compose docs.
+    # https://docs.docker.com/compose/intro/compose-application-model/#the-compose-file
+    names = [
+        "compose.yaml",
+        "compose.yml",
+        "docker-compose.yaml",
+        "docker-compose.yml",
+    ]
+    paths = (basedir / filename for filename in names)
+    exisiting_paths = (path for path in paths if path.is_file())
 
-    return os.path.join(str(pytestconfig.rootdir), "tests", "docker-compose.yml")
+    return next(exisiting_paths, None)
+
+
+@pytest.fixture(scope=containers_scope)
+def docker_compose_file(pytestconfig: Config) -> Union[List[str], str]:
+    """Get an absolute path to the compose file. Override this fixture in your tests
+    if you need a custom location."""
+
+    tests_dir = Path(pytestconfig.rootpath) / "tests"
+    fallback_path = tests_dir / "docker-compose.yml"
+
+    return str(_find_compose_file(tests_dir) or fallback_path)
 
 
 @pytest.fixture(scope=containers_scope)

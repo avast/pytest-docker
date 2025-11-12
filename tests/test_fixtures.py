@@ -1,15 +1,61 @@
-import os.path
+import os
+from pathlib import Path
 from typing import List
 
 import pytest
 from _pytest.fixtures import FixtureRequest
 from _pytest.pytester import Pytester
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+
+@pytest.fixture
+def tests_dir(pytester: Pytester) -> Path:
+    dir = Path(pytester.path) / "tests"
+    dir.mkdir()
+    return dir
 
 
-def test_docker_compose_file(docker_compose_file: str) -> None:
-    assert docker_compose_file == os.path.join(HERE, "docker-compose.yml")
+@pytest.fixture(params=[[]])
+def tests_dir_contents(tests_dir: Path, request: FixtureRequest) -> List[Path]:
+    filenames: List[str] = getattr(request, "param", [])
+    paths = [tests_dir / filename for filename in filenames]
+    for path in paths:
+        path.touch()
+
+    return paths
+
+
+@pytest.mark.parametrize(
+    ("tests_dir_contents", "expected_compose_file"),
+    [
+        (
+            [
+                "compose.yaml",
+                "compose.yml",
+                "docker-compose.yaml",
+                "docker-compose.yml",
+            ],
+            "compose.yaml",
+        ),
+        (["compose.yml", "docker-compose.yaml", "docker-compose.yml"], "compose.yml"),
+        (["docker-compose.yaml", "docker-compose.yml"], "docker-compose.yaml"),
+        (["docker-compose.yml"], "docker-compose.yml"),
+        ([], "docker-compose.yml"),
+    ],
+    indirect=["tests_dir_contents"],
+)
+@pytest.mark.usefixtures("tests_dir_contents")
+def test_docker_compose_file(
+    pytester: Pytester, expected_compose_file: str, tests_dir: Path
+) -> None:
+    pytester.makepyfile(
+        f"""
+        def test_docker_compose_file(docker_compose_file):
+            assert docker_compose_file == "{tests_dir}/{expected_compose_file}"
+    """
+    )
+
+    result = pytester.runpytest()
+    result.assert_outcomes(passed=1)
 
 
 def test_docker_compose_project(docker_compose_project_name: str) -> None:
