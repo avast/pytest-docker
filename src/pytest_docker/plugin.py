@@ -179,7 +179,7 @@ def docker_cleanup() -> Union[List[str], str]:
 
 
 def get_setup_command() -> Union[List[str], str]:
-    return ["up --build -d"]
+    return ["up --build --wait"]
 
 
 @pytest.fixture(scope=containers_scope)
