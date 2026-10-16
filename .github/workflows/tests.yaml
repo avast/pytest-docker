@@ -8,12 +8,30 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
-        pytest-version: [4, 5, 6, 7, 8, 9]
+        pytest-version: [6, 7, 8, 9]
         exclude:
           - python-version: "3.8"
             pytest-version: 9
           - python-version: "3.9"
             pytest-version: 9
+          - python-version: "3.11"
+            pytest-version: 6
+          - python-version: "3.12"
+            pytest-version: 6
+          - python-version: "3.13"
+            pytest-version: 6
+          - python-version: "3.13"
+            pytest-version: 7
+          - python-version: "3.14"
+            pytest-version: 6
+          - python-version: "3.14"
+            pytest-version: 7
+          - python-version: "3.15"
+            pytest-version: 6
+          - python-version: "3.15"
+            pytest-version: 7
+          - python-version: "3.15"
+            pytest-version: 8
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -23,15 +41,30 @@ jobs:
       - name: Install dependencies, pytest ${{ matrix.pytest-version }}
         run: |
           python -m pip install --upgrade pip setuptools
-          pip install pytest==${{ matrix.pytest-version }}
-          pip install ".[tests]"
+          python -m pip install "pytest==${{ matrix.pytest-version }}.*" . "requests>=2.22.0,<3.0"
       - name: Build image
         run: |
           docker compose -f tests/docker-compose.yml pull
           docker compose -f tests/docker-compose.yml build
       - name: Run tests
         run: |
-          pytest -c setup.cfg
+          python -m pytest -c setup.cfg -o addopts= --verbose
       - name: Stop Docker compose
+        if: always()
         run: |
           docker compose -f tests/docker-compose.yml down
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools
+          python -m pip install "pytest==8.*" ".[tests]"
+      - name: Run static checks
+        run: |
+          python -m pytest -c setup.cfg -k "mypy or pycodestyle or pylint"
